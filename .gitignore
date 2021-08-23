@@ -11,5 +11,5 @@ cobertura.xml
 coverage-html/
 docs/
 ipch
-path-oram/bin/*
-!path-oram/bin/.gitkeep
+scheme/bin/*
+!scheme/bin/.gitkeep

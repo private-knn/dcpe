@@ -6,7 +6,7 @@
 		"command": "make debug -j8",
 		"args": [],
 		"options": {
-			"cwd": "${workspaceFolder}/path-oram"
+			"cwd": "${workspaceFolder}/scheme"
 		},
 		"group": {
 			"kind": "build",

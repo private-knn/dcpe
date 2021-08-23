@@ -4,7 +4,7 @@
 			"name": "Mac",
 			"includePath": [
 				"${workspaceFolder}/**",
-				"${workspaceFolder}/path-oram/include/*",
+				"${workspaceFolder}/scheme/include/*",
 				"/usr/local/Cellar/boost/1.72.0/include",
 				"/usr/local/opt/openssl/include"
 			],

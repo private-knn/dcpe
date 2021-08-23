@@ -5,7 +5,7 @@ stages:
   - deploy
 
 variables:
-  PROJECT_DIR: "path-oram"
+  PROJECT_DIR: "scheme"
   CI_REF: &ref 85f8a6f6305719f3c234b5368fa8f7e5ce5d099c
 
 build-binaries:

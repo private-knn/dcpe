@@ -2,7 +2,7 @@
 
 This is an implementation of the PathORAM algorithm from the [original paper](https://eprint.iacr.org/2013/280.pdf).
 This implementation has the following features:
-- it's written in C++ and is compilable into a standalone shared library (see [usage example](./path-oram/test/test-shared-lib.cpp))
+- it's written in C++ and is compilable into a standalone shared library (see [usage example](./scheme/test/test-shared-lib.cpp))
 - all components (storage, position map and stash) are abstracted via interfaces
 - storage component can be
 	- `InMemory` (using a preallocated heap array)
@@ -47,7 +47,7 @@ Dependencies:
 	- To use `Aerospike`, an Aerospike instance has to be accessible over `127.0.0.1:3000`
 		- For example: `docker run -it -p 3000:3000 aerospike/aerospike-server`
 
-[Makefile](./path-oram/Makefile) is used for everything.
+[Makefile](./scheme/Makefile) is used for everything.
 
 ```bash
 # to only compile shared library
