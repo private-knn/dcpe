@@ -38,6 +38,22 @@ namespace DCPE
 
 		ASSERT_EQ(first, second);
 	}
+
+	TEST_F(UtilityTest, SameSeedNumber)
+	{
+		const auto max = 100000uLL;
+		int seed	   = 0x15;
+
+		srand(seed);
+
+		auto first = get_ramdom_number(max);
+
+		srand(seed);
+
+		auto second = get_ramdom_number(max);
+
+		ASSERT_EQ(first, second);
+	}
 }
 
 int main(int argc, char **argv)

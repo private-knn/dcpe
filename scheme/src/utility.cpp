@@ -27,9 +27,9 @@ namespace DCPE
 	{
 		number material[1];
 #if defined(TESTING) || defined(DEBUG)
-		auto intMaterial = (int *)material;
-		intMaterial[0]	 = rand();
-		intMaterial[1]	 = rand();
+		auto int_material = (int *)material;
+		int_material[0]	 = rand();
+		int_material[1]	 = rand();
 #else
 		RAND_bytes((uchar *)material, sizeof(number));
 #endif
