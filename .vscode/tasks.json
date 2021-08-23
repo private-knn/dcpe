@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [{
+		"label": "build",
+		"type": "shell",
+		"command": "make debug -j8",
+		"args": [],
+		"options": {
+			"cwd": "${workspaceFolder}/path-oram"
+		},
+		"group": {
+			"kind": "build",
+			"isDefault": true
+		}
+	}]
+}

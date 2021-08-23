@@ -1,0 +1,15 @@
+*.out
+*.o
+*.dSYM
+*.gcov
+*.gcda
+*.gcno
+*.tmp
+*.bin
+junit-*.xml
+cobertura.xml
+coverage-html/
+docs/
+ipch
+path-oram/bin/*
+!path-oram/bin/.gitkeep

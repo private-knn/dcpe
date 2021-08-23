@@ -1,0 +1,50 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Test",
+			"type": "lldb",
+			"request": "launch",
+			"program": "${workspaceFolder}/path-oram/bin/test-${input:test}",
+			"args": [],
+			"cwd": "${workspaceFolder}/path-oram/",
+			"preLaunchTask": "build"
+		},
+		{
+			"name": "Benchmark",
+			"type": "lldb",
+			"request": "launch",
+			"program": "${workspaceFolder}/path-oram/bin/benchmark-${input:benchmark}",
+			"args": [],
+			"cwd": "${workspaceFolder}/path-oram/",
+			"preLaunchTask": "build"
+		}
+	],
+	"inputs": [
+		{
+			"id": "test",
+			"type": "pickString",
+			"description": "Pick the test file to debug",
+			"options": [
+				"storage-adapter",
+				"stash-adapter",
+				"position-map-adapter",
+				"utility",
+				"oram",
+				"oram-big"
+			],
+			"default": "oram"
+		},
+		{
+			"id": "benchmark",
+			"type": "pickString",
+			"description": "Pick the benchmark file to debug",
+			"options": [
+				"storage-adapter",
+				"utility",
+				"oram",
+			],
+			"default": "oram"
+		}
+	]
+}
