@@ -13,7 +13,7 @@ build-binaries:
   stage: build
   script:
     - cd ./$PROJECT_DIR
-    - make binaries shared CPPFLAGS="-DUSE_AEROSPIKE=false"
+    - make binaries shared
   artifacts:
     expire_in: 30 min
     paths:
@@ -39,9 +39,6 @@ build-docs:
 
 unit-test:
   image: dbogatov/docker-images:pbc-latest
-  services:
-  - redis:5
-  - aerospike:latest
   stage: test
   script:
     - cd ./$PROJECT_DIR/
@@ -58,19 +55,6 @@ unit-test:
   tags:
     - docker
 
-integration-test:
-  image: dbogatov/docker-images:pbc-latest
-  services:
-  - redis:5
-  - aerospike:latest
-  stage: test
-  script:
-    - cd ./$PROJECT_DIR/
-    - make run-integration
-  dependencies: []
-  tags:
-    - docker
-
 benchmarks:
   image: dbogatov/docker-images:pbc-latest
   services:
@@ -84,16 +68,15 @@ benchmarks:
   tags:
     - docker
 
-shared-library:
-  image: dbogatov/docker-images:pbc-latest
-  stage: test
-  script:
-    - cd ./$PROJECT_DIR/
-    - make shared ldconfig run-shared-lib
-    - make shared ldconfig run-stash-size
-  dependencies: []
-  tags:
-    - docker
+# shared-library:
+#   image: dbogatov/docker-images:pbc-latest
+#   stage: test
+#   script:
+#     - cd ./$PROJECT_DIR/
+#     - make shared ldconfig run-shared-lib
+#   dependencies: []
+#   tags:
+#     - docker
 
 release-library:
   image: dbogatov/docker-images:alpine-extras-latest
@@ -148,8 +131,8 @@ pages:
   only:
     - master
 
-include:
-  # DEPLOY
-  - project: "templates/ci-snippets"
-    file: "trigger-websites-deploy.yml"
-    ref: *ref
+# include:
+#   # DEPLOY
+#   - project: "templates/ci-snippets"
+#     file: "trigger-websites-deploy.yml"
+#     ref: *ref

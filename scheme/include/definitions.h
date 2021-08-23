@@ -5,18 +5,6 @@
 #include <string>
 #include <vector>
 
-#ifndef INPUT_CHECKS
-#define INPUT_CHECKS true
-#endif
-
-#ifndef USE_REDIS
-#define USE_REDIS true
-#endif
-
-#ifndef USE_AEROSPIKE
-#define USE_AEROSPIKE true
-#endif
-
 // use 256-bit security
 #define KEYSIZE 32
 
@@ -27,7 +15,7 @@
 // change to run all tests from different seed
 #define TEST_SEED 0x13
 
-namespace PathORAM
+namespace DCPE
 {
 	using namespace std;
 
@@ -37,8 +25,6 @@ namespace PathORAM
 	using uchar	 = unsigned char;
 	using uint	 = unsigned int;
 	using bytes	 = vector<uchar>;
-	using block	 = pair<number, bytes>;
-	using bucket = vector<block>;
 
 	enum EncryptionMode
 	{
