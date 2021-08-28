@@ -58,8 +58,8 @@ unit-test:
 benchmarks:
   image: dbogatov/docker-images:pbc-latest
   services:
-  - redis:5
-  - aerospike:latest
+    - redis:5
+    - aerospike:latest
   stage: test
   script:
     - cd ./$PROJECT_DIR/
@@ -130,7 +130,6 @@ pages:
     - docker
   only:
     - master
-
 # include:
 #   # DEPLOY
 #   - project: "templates/ci-snippets"
