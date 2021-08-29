@@ -27,7 +27,7 @@ namespace DCPE
 	TEST_F(UtilityTest, RandomSameSeed)
 	{
 		const auto n = 20uLL;
-		int seed	 = 0x15;
+		int seed	 = TEST_SEED + 1;
 
 		srand(seed);
 
@@ -43,7 +43,7 @@ namespace DCPE
 	TEST_F(UtilityTest, RandomNumberSameSeed)
 	{
 		const auto max = 100000uLL;
-		int seed	   = 0x15;
+		int seed	   = TEST_SEED + 1;
 
 		srand(seed);
 
@@ -172,8 +172,8 @@ namespace DCPE
 		const auto count = 10uLL;
 		for (number i = 0; i < 100; i++)
 		{
-			auto first	= sample_normal_multivariate_identity(0, count, i);
-			auto second = sample_normal_multivariate_identity(0, count, i);
+			auto first	= sample_normal_multivariate_identity(1, count, i);
+			auto second = sample_normal_multivariate_identity(1, count, i);
 
 			ASSERT_EQ(first, second);
 		}
@@ -189,9 +189,7 @@ namespace DCPE
 		}
 
 		auto keys = hmac_256_keygen(hash_key);
-
-		cout << hmac_key_to_string(keys.first);
-		cout << hmac_key_to_string(keys.second);
+		ASSERT_NE(EVP_PKEY_cmp(keys.first, keys.second), 0);
 	}
 
 	TEST_F(UtilityTest, HmacKeygenTwoKeys)
@@ -203,7 +201,7 @@ namespace DCPE
 
 	TEST_F(UtilityTest, HmacKeygenSame)
 	{
-		int seed = 0x15;
+		int seed = TEST_SEED + 1;
 
 		srand(seed);
 
@@ -238,13 +236,25 @@ namespace DCPE
 			auto verified  = hmac_256_verify(keys.second, message, signature);
 
 			ASSERT_TRUE(verified);
+
+			auto different_message = message;
+			different_message[0]++;
+
+			verified = hmac_256_verify(keys.second, different_message, signature);
+			ASSERT_FALSE(verified);
+
+			auto different_signature = signature;
+			different_signature[0]++;
+
+			verified = hmac_256_verify(keys.second, message, different_signature);
+			ASSERT_FALSE(verified);
 		}
 	}
 }
 
 int main(int argc, char **argv)
 {
-	srand(0x13);
+	srand(TEST_SEED);
 
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();

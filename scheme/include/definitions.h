@@ -13,6 +13,8 @@
 
 #define TO_ARRAY(x) &x[0]
 
+#define INPUTS_CHECK
+
 namespace DCPE
 {
 	using namespace std;

@@ -65,8 +65,32 @@ namespace DCPE
 	 */
 	vector<double> sample_normal_multivariate_identity(const double mean, const number dimensions, const number seed);
 
-	keys hmac_256_keygen(bytes hash_Key = bytes());
+	/**
+	 * @brief Generates a pair of keys to be used in HMAC sign and verify routines
+	 *
+	 * @param hash_key an optional base hash key to be used in key derivation.
+	 * Use for debugging and testing.
+	 * @return keys sign and verify keys
+	 */
+	keys hmac_256_keygen(bytes hash_key = bytes());
+
+	/**
+	 * @brief produces an HMAC signature of the given message under given sign key
+	 *
+	 * @param key sign key produced in hmac_256_keygen
+	 * @param message an input to sign
+	 * @return bytes the signature of the input
+	 */
 	bytes hmac_256_sign(key key, bytes message);
+
+	/**
+	 * @brief checks if a signature verifies for given message under given verification key
+	 *
+	 * @param key verification key produced in hmac_256_keygen
+	 * @param message an input that was sign
+	 * @param signature a signature produced in hmac_256_sign
+	 * @return true if signature verifies
+	 * @return false otherwise
+	 */
 	bool hmac_256_verify(key key, bytes message, bytes signature);
-	string hmac_key_to_string(key key);
 }

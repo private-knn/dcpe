@@ -13,11 +13,15 @@
 #include <random>
 #include <vector>
 
+#ifndef TESTING
 #define CHECK_OPENSSL_ERROR(condition, message)                                        \
 	if (condition)                                                                     \
 	{                                                                                  \
 		throw Exception(boost::format("%s, error 0x%lx") % message % ERR_get_error()); \
 	}
+#else
+#define CHECK_OPENSSL_ERROR(condition, message)
+#endif
 
 namespace DCPE
 {
@@ -108,9 +112,9 @@ namespace DCPE
 		size_t size;
 		if (hash_key.size() == 0)
 		{
-			auto md		  = EVP_get_digestbyname("SHA256");
-			size		  = EVP_MD_size(md);
-			auto hash_key = get_random_bytes(size);
+			auto md	 = EVP_get_digestbyname("SHA256");
+			size	 = EVP_MD_size(md);
+			hash_key = get_random_bytes(size);
 		}
 		else
 		{
@@ -132,8 +136,10 @@ namespace DCPE
 
 		signature_length = 0;
 
+#ifndef TESTING
 		try
 		{
+#endif
 			context = EVP_MD_CTX_new();
 			CHECK_OPENSSL_ERROR(context == NULL, "EVP_MD_CTX_create failed")
 
@@ -160,6 +166,7 @@ namespace DCPE
 			return_code		 = EVP_DigestSignFinal(context, signature, &signature_length);
 			CHECK_OPENSSL_ERROR(return_code != 1, "EVP_DigestSignFinal failed (3)")
 			CHECK_OPENSSL_ERROR(requested != signature_length, "EVP_DigestSignFinal failed (4)")
+#ifndef TESTING
 		}
 		catch (const std::exception &e)
 		{
@@ -172,6 +179,7 @@ namespace DCPE
 
 			throw e;
 		}
+#endif
 
 		if (context)
 		{
@@ -188,8 +196,10 @@ namespace DCPE
 		EVP_MD_CTX *context = NULL;
 		auto result			= false;
 
+#ifndef TESTING
 		try
 		{
+#endif
 			context = EVP_MD_CTX_new();
 			CHECK_OPENSSL_ERROR(context == NULL, "EVP_MD_CTX_create failed")
 
@@ -213,7 +223,8 @@ namespace DCPE
 			CHECK_OPENSSL_ERROR(!(buffer_size > 0), "EVP_DigestSignFinal failed (2)")
 
 			const auto memory_length = (signature.size() < buffer_size ? signature.size() : buffer_size);
-			result					 = !!CRYPTO_memcmp(TO_ARRAY(signature), buffer, memory_length);
+			result					 = 0 == CRYPTO_memcmp(TO_ARRAY(signature), buffer, memory_length);
+#ifndef TESTING
 		}
 		catch (const std::exception &e)
 		{
@@ -221,6 +232,7 @@ namespace DCPE
 
 			throw e;
 		}
+#endif
 
 		if (context)
 		{
@@ -229,29 +241,5 @@ namespace DCPE
 		}
 
 		return result;
-	}
-
-	string hmac_key_to_string(key key)
-	{
-		BIO *bio  = NULL;
-		char *pem = NULL;
-
-		if (NULL == key)
-			return NULL;
-
-		if ((bio = BIO_new(BIO_s_mem())) == NULL)
-			return NULL;
-
-		if (1 != EVP_PKEY_print_private(bio, key, 0, NULL))
-		{
-			BIO_free(bio);
-			return NULL;
-		}
-
-		pem = (char *)calloc(1, 500 + 1);
-		BIO_read(bio, pem, 500);
-		BIO_free(bio);
-
-		return pem;
 	}
 }
