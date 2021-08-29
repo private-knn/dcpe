@@ -178,10 +178,74 @@ namespace DCPE
 			ASSERT_EQ(first, second);
 		}
 	}
+
+	TEST_F(UtilityTest, HmacKeygenGivenHashKey)
+	{
+		bytes hash_key;
+		auto key_size = EVP_MD_size(EVP_get_digestbyname("SHA256"));
+		for (size_t i = 0; i < key_size; i++)
+		{
+			hash_key.push_back((byte)i);
+		}
+
+		auto keys = hmac_256_keygen(hash_key);
+
+		cout << hmac_key_to_string(keys.first);
+		cout << hmac_key_to_string(keys.second);
+	}
+
+	TEST_F(UtilityTest, HmacKeygenTwoKeys)
+	{
+		auto keys = hmac_256_keygen();
+
+		ASSERT_NE(EVP_PKEY_cmp(keys.first, keys.second), 0);
+	}
+
+	TEST_F(UtilityTest, HmacKeygenSame)
+	{
+		int seed = 0x15;
+
+		srand(seed);
+
+		auto first = hmac_256_keygen();
+
+		srand(seed);
+
+		auto second = hmac_256_keygen();
+
+		ASSERT_NE(EVP_PKEY_cmp_parameters(first.first, second.first), 0);
+		ASSERT_NE(EVP_PKEY_cmp_parameters(first.second, second.second), 0);
+	}
+
+	TEST_F(UtilityTest, HmacKeygenDifferent)
+	{
+		auto first	= hmac_256_keygen();
+		auto second = hmac_256_keygen();
+
+		ASSERT_EQ(EVP_PKEY_cmp(first.first, second.first), 0);
+		ASSERT_EQ(EVP_PKEY_cmp(first.second, second.second), 0);
+	}
+
+	TEST_F(UtilityTest, HmacSignVerify)
+	{
+		const auto runs = 100;
+
+		for (auto i = 0; i < runs; i++)
+		{
+			auto message   = get_random_bytes(100);
+			auto keys	   = hmac_256_keygen();
+			auto signature = hmac_256_sign(keys.first, message);
+			auto verified  = hmac_256_verify(keys.second, message, signature);
+
+			ASSERT_TRUE(verified);
+		}
+	}
 }
 
 int main(int argc, char **argv)
 {
+	srand(0x13);
+
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }

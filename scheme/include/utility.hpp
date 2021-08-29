@@ -2,9 +2,14 @@
 
 #include "definitions.h"
 
+#include <openssl/evp.h>
+
 namespace DCPE
 {
 	using namespace std;
+
+	using key  = EVP_PKEY *;
+	using keys = pair<key, key>;
 
 	/**
 	 * @brief generate an array of bytes pseudorandomly
@@ -59,4 +64,9 @@ namespace DCPE
 	 * @return vector<double> the sample value
 	 */
 	vector<double> sample_normal_multivariate_identity(const double mean, const number dimensions, const number seed);
+
+	keys hmac_256_keygen(bytes hash_Key = bytes());
+	bytes hmac_256_sign(key key, bytes message);
+	bool hmac_256_verify(key key, bytes message, bytes signature);
+	string hmac_key_to_string(key key);
 }

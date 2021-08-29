@@ -7,9 +7,17 @@
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <iomanip>
+#include <openssl/err.h>
+#include <openssl/pem.h>
 #include <openssl/rand.h>
 #include <random>
 #include <vector>
+
+#define CHECK_OPENSSL_ERROR(condition, message)                                        \
+	if (condition)                                                                     \
+	{                                                                                  \
+		throw Exception(boost::format("%s, error 0x%lx") % message % ERR_get_error()); \
+	}
 
 namespace DCPE
 {
@@ -93,5 +101,157 @@ namespace DCPE
 		}
 
 		return samples;
+	}
+
+	keys hmac_256_keygen(bytes hash_key)
+	{
+		size_t size;
+		if (hash_key.size() == 0)
+		{
+			auto md		  = EVP_get_digestbyname("SHA256");
+			size		  = EVP_MD_size(md);
+			auto hash_key = get_random_bytes(size);
+		}
+		else
+		{
+			size = hash_key.size();
+		}
+
+		auto signing_key   = EVP_PKEY_new_mac_key(EVP_PKEY_HMAC, NULL, TO_ARRAY(hash_key), size);
+		auto verifying_key = EVP_PKEY_new_mac_key(EVP_PKEY_HMAC, NULL, TO_ARRAY(hash_key), size);
+
+		return {signing_key, verifying_key};
+	}
+
+	bytes hmac_256_sign(key key, bytes message)
+	{
+		EVP_MD_CTX *context = NULL;
+		byte *signature		= NULL;
+		size_t requested	= 0;
+		size_t signature_length;
+
+		signature_length = 0;
+
+		try
+		{
+			context = EVP_MD_CTX_new();
+			CHECK_OPENSSL_ERROR(context == NULL, "EVP_MD_CTX_create failed")
+
+			const auto *md = EVP_get_digestbyname("SHA256");
+			CHECK_OPENSSL_ERROR(md == NULL, "EVP_get_digestbyname failed")
+
+			auto return_code = EVP_DigestInit_ex(context, md, NULL);
+			CHECK_OPENSSL_ERROR(return_code != 1, "EVP_DigestInit_ex failed")
+
+			return_code = EVP_DigestSignInit(context, NULL, md, NULL, key);
+			CHECK_OPENSSL_ERROR(return_code != 1, "EVP_DigestSignInit failed")
+
+			return_code = EVP_DigestSignUpdate(context, TO_ARRAY(message), message.size());
+			CHECK_OPENSSL_ERROR(return_code != 1, "EVP_DigestSignUpdate failed")
+
+			return_code = EVP_DigestSignFinal(context, NULL, &requested);
+			CHECK_OPENSSL_ERROR(return_code != 1, "EVP_DigestSignFinal failed (1)")
+			CHECK_OPENSSL_ERROR(!(requested > 0), "EVP_DigestSignFinal failed (2)")
+
+			signature = static_cast<byte *>(OPENSSL_malloc(requested));
+			CHECK_OPENSSL_ERROR(signature == NULL, "OPENSSL_malloc failed")
+
+			signature_length = requested;
+			return_code		 = EVP_DigestSignFinal(context, signature, &signature_length);
+			CHECK_OPENSSL_ERROR(return_code != 1, "EVP_DigestSignFinal failed (3)")
+			CHECK_OPENSSL_ERROR(requested != signature_length, "EVP_DigestSignFinal failed (4)")
+		}
+		catch (const std::exception &e)
+		{
+			EVP_MD_CTX_free(context);
+			if (signature != NULL)
+			{
+				OPENSSL_free(signature);
+				signature = NULL;
+			}
+
+			throw e;
+		}
+
+		if (context)
+		{
+			EVP_MD_CTX_destroy(context);
+			context = NULL;
+		}
+
+		bytes result(signature, signature + signature_length);
+		return result;
+	}
+
+	bool hmac_256_verify(key key, bytes message, bytes signature)
+	{
+		EVP_MD_CTX *context = NULL;
+		auto result			= false;
+
+		try
+		{
+			context = EVP_MD_CTX_new();
+			CHECK_OPENSSL_ERROR(context == NULL, "EVP_MD_CTX_create failed")
+
+			const auto *md = EVP_get_digestbyname("SHA256");
+			CHECK_OPENSSL_ERROR(md == NULL, "EVP_get_digestbyname failed")
+
+			auto return_code = EVP_DigestInit_ex(context, md, NULL);
+			CHECK_OPENSSL_ERROR(return_code != 1, "EVP_DigestInit_ex failed")
+
+			return_code = EVP_DigestSignInit(context, NULL, md, NULL, key);
+			CHECK_OPENSSL_ERROR(return_code != 1, "EVP_DigestSignInit failed")
+
+			return_code = EVP_DigestSignUpdate(context, TO_ARRAY(message), message.size());
+			CHECK_OPENSSL_ERROR(return_code != 1, "EVP_DigestSignUpdate failed")
+
+			byte buffer[EVP_MAX_MD_SIZE];
+			auto buffer_size = sizeof(buffer);
+
+			return_code = EVP_DigestSignFinal(context, buffer, &buffer_size);
+			CHECK_OPENSSL_ERROR(return_code != 1, "EVP_DigestVerifyFinal failed")
+			CHECK_OPENSSL_ERROR(!(buffer_size > 0), "EVP_DigestSignFinal failed (2)")
+
+			const auto memory_length = (signature.size() < buffer_size ? signature.size() : buffer_size);
+			result					 = !!CRYPTO_memcmp(TO_ARRAY(signature), buffer, memory_length);
+		}
+		catch (const std::exception &e)
+		{
+			EVP_MD_CTX_free(context);
+
+			throw e;
+		}
+
+		if (context)
+		{
+			EVP_MD_CTX_destroy(context);
+			context = NULL;
+		}
+
+		return result;
+	}
+
+	string hmac_key_to_string(key key)
+	{
+		BIO *bio  = NULL;
+		char *pem = NULL;
+
+		if (NULL == key)
+			return NULL;
+
+		if ((bio = BIO_new(BIO_s_mem())) == NULL)
+			return NULL;
+
+		if (1 != EVP_PKEY_print_private(bio, key, 0, NULL))
+		{
+			BIO_free(bio);
+			return NULL;
+		}
+
+		pem = (char *)calloc(1, 500 + 1);
+		BIO_read(bio, pem, 500);
+		BIO_free(bio);
+
+		return pem;
 	}
 }

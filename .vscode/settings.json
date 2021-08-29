@@ -76,6 +76,12 @@
 		"typeinfo": "cpp",
 		"unordered_map": "cpp",
 		"variant": "cpp",
-		"vector": "cpp"
+		"vector": "cpp",
+		"__memory": "cpp",
+		"filesystem": "cpp",
+		"*.ipp": "cpp",
+		"*.tcc": "cpp",
+		"queue": "cpp",
+		"ranges": "cpp"
 	}
 }

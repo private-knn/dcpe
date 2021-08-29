@@ -26,25 +26,18 @@
 			"type": "pickString",
 			"description": "Pick the test file to debug",
 			"options": [
-				"storage-adapter",
-				"stash-adapter",
-				"position-map-adapter",
-				"utility",
-				"oram",
-				"oram-big"
+				"utility"
 			],
-			"default": "oram"
+			"default": "utility"
 		},
 		{
 			"id": "benchmark",
 			"type": "pickString",
 			"description": "Pick the benchmark file to debug",
 			"options": [
-				"storage-adapter",
-				"utility",
-				"oram",
+				"utility"
 			],
-			"default": "oram"
+			"default": "utility"
 		}
 	]
 }

@@ -8,12 +8,10 @@
 // use 256-bit security
 #define KEYSIZE 32
 
-// 256 bit hash size (SHA-256)
-#define HASHSIZE 256
-#define HASH_ALGORITHM EVP_sha256
-
 // change to run all tests from different seed
 #define TEST_SEED 0x13
+
+#define TO_ARRAY(x) &x[0]
 
 namespace DCPE
 {
@@ -23,8 +21,9 @@ namespace DCPE
 	// change (e.g. to unsigned int) if needed
 	using number = unsigned long long;
 	using uchar	 = unsigned char;
+	using byte	 = unsigned char;
 	using uint	 = unsigned int;
-	using bytes	 = vector<uchar>;
+	using bytes	 = vector<byte>;
 
 	enum EncryptionMode
 	{
