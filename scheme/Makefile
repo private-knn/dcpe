@@ -23,7 +23,7 @@ LIBNAME=dcpe
 # $(IDIR)/CLASS.hpp, a code in $(SDIR)/CLASS.cpp and a test in $(TDIR)/test-CLASS.cpp,
 # then the rest will magically work - it will compile each class and test and will run the tests.
 # CLASS does not even have to be a class in C++.
-ENTITIES = utility
+ENTITIES = utility scheme
 
 # dependencies - definitions plus header files
 _DEPS = definitions.h $(addsuffix .hpp, $(ENTITIES))
@@ -36,7 +36,7 @@ TESTS = $(ENTITIES)
 TESTBIN = $(addprefix $(BDIR)/test-, $(TESTS))
 JUNITS= $(foreach test, $(TESTS), bin/test-$(test)?--gtest_output=xml:junit-$(test).xml)
 
-BENCHMARKS = utility
+BENCHMARKS = $(ENTITIES)
 BENCHMARKSBIN = $(addprefix $(BDIR)/benchmark-, $(BENCHMARKS))
 
 ENTRYPOINTCC = $(CC) -o $@ $^ $(CPPFLAGS) $(INCLUDES) $(LDLIBS) $(LDTESTLIBS) $(LDFLAGS)

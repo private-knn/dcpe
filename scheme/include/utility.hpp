@@ -2,14 +2,9 @@
 
 #include "definitions.h"
 
-#include <openssl/evp.h>
-
 namespace DCPE
 {
 	using namespace std;
-
-	using key  = EVP_PKEY *;
-	using keys = pair<key, key>;
 
 	/**
 	 * @brief generate an array of bytes pseudorandomly
@@ -30,6 +25,14 @@ namespace DCPE
 	 * @return number the resulting number
 	 */
 	number get_ramdom_number(const number max);
+
+	/**
+	 * @brief a helper that composes a value of type "number" from a series of bytes
+	 *
+	 * @param first_byte an iterator at the element of byte vector from which to start collecting bytes
+	 * @return number a resulting concatentation of bytes represented as a number
+	 */
+	number bytes_to_number(bytes::iterator first_byte);
 
 	/**
 	 * @brief Samples a real uniform value [min, max] using random coins from the seed
@@ -72,7 +75,7 @@ namespace DCPE
 	 * Use for debugging and testing.
 	 * @return keys sign and verify keys
 	 */
-	keys hmac_256_keygen(bytes hash_key = bytes());
+	prf_keys hmac_256_keygen(bytes hash_key = bytes());
 
 	/**
 	 * @brief produces an HMAC signature of the given message under given sign key
@@ -81,7 +84,7 @@ namespace DCPE
 	 * @param message an input to sign
 	 * @return bytes the signature of the input
 	 */
-	bytes hmac_256_sign(key key, bytes message);
+	bytes hmac_256_sign(prf_key key, bytes message);
 
 	/**
 	 * @brief checks if a signature verifies for given message under given verification key
@@ -92,5 +95,5 @@ namespace DCPE
 	 * @return true if signature verifies
 	 * @return false otherwise
 	 */
-	bool hmac_256_verify(key key, bytes message, bytes signature);
+	bool hmac_256_verify(prf_key key, bytes message, bytes signature);
 }

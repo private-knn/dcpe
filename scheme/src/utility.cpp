@@ -32,7 +32,7 @@ namespace DCPE
 	 * boost::minstd_rand is NOT crypto-safe.
 	 *
 	 */
-	typedef boost::random::mt19937 base_generator_type;
+	typedef boost::random::mt19937_64 base_generator_type;
 
 	bytes get_random_bytes(const number size)
 	{
@@ -59,6 +59,19 @@ namespace DCPE
 		RAND_bytes((uchar *)material, sizeof(number));
 #endif
 		return material[0] % max;
+	}
+
+	number bytes_to_number(bytes::iterator first_byte)
+	{
+		number material[1];
+		auto byte_material = (byte *)material;
+		for (auto i = 0; i < sizeof(number) / sizeof(byte); i++)
+		{
+			byte_material[0] = *first_byte;
+			first_byte++;
+		}
+
+		return material[0];
 	}
 
 	double sample_uniform(const double min, const double max, const number seed)
@@ -107,7 +120,7 @@ namespace DCPE
 		return samples;
 	}
 
-	keys hmac_256_keygen(bytes hash_key)
+	prf_keys hmac_256_keygen(bytes hash_key)
 	{
 		size_t size;
 		if (hash_key.size() == 0)
@@ -127,7 +140,7 @@ namespace DCPE
 		return {signing_key, verifying_key};
 	}
 
-	bytes hmac_256_sign(key key, bytes message)
+	bytes hmac_256_sign(prf_key key, bytes message)
 	{
 		EVP_MD_CTX *context = NULL;
 		byte *signature		= NULL;
@@ -191,7 +204,7 @@ namespace DCPE
 		return result;
 	}
 
-	bool hmac_256_verify(key key, bytes message, bytes signature)
+	bool hmac_256_verify(prf_key key, bytes message, bytes signature)
 	{
 		EVP_MD_CTX *context = NULL;
 		auto result			= false;

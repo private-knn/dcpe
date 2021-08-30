@@ -2,18 +2,14 @@
 
 #include <boost/format.hpp>
 #include <climits>
+#include <openssl/evp.h>
 #include <string>
 #include <vector>
-
-// use 256-bit security
-#define KEYSIZE 32
 
 // change to run all tests from different seed
 #define TEST_SEED 0x13
 
 #define TO_ARRAY(x) &x[0]
-
-#define INPUTS_CHECK
 
 namespace DCPE
 {
@@ -27,18 +23,10 @@ namespace DCPE
 	using uint	 = unsigned int;
 	using bytes	 = vector<byte>;
 
-	enum EncryptionMode
-	{
-		ENCRYPT,
-		DECRYPT
-	};
+	using prf_key  = EVP_PKEY*;
+	using prf_keys = pair<prf_key, prf_key>;
 
-	enum BlockCipherMode
-	{
-		CBC,
-		CTR,
-		NONE
-	};
+	using key = pair<prf_key, number>;
 
 	/**
 	 * @brief Primitive exception class that passes along the excpetion message
@@ -73,10 +61,4 @@ namespace DCPE
 		protected:
 		string msg_;
 	};
-
-	/**
-	 * @brief global setting, block cipher mode which will be used for encryption
-	 *
-	 */
-	inline BlockCipherMode __blockCipherMode = CBC;
 }
