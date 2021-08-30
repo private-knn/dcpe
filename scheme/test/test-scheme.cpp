@@ -30,6 +30,7 @@ namespace DCPE
 	TEST_F(SchemeTest, EncryptDecrypt)
 	{
 		const auto runs = 10;
+		const auto error = 1.0;
 
 		for (auto &&dimensions : {1, 2, 3, 5, 10, 25, 50})
 		{
@@ -50,7 +51,7 @@ namespace DCPE
 
 				for (auto i = 0; i < dimensions; i++)
 				{
-					ASSERT_NEAR(message[i], decrypted[i], 0.00001);
+					ASSERT_NEAR(message[i], decrypted[i], error);
 				}
 			}
 		}
