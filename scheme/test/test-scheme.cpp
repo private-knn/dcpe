@@ -29,8 +29,14 @@ namespace DCPE
 
 	TEST_F(SchemeTest, EncryptDecrypt)
 	{
-		const auto runs = 10;
+		const auto runs	 = 10;
 		const auto error = 1.0;
+
+		auto get_random_double = [](auto min, auto max)
+		{
+			double f = (double)rand() / RAND_MAX;
+			return min + f * (max - min);
+		};
 
 		for (auto &&dimensions : {1, 2, 3, 5, 10, 25, 50})
 		{
@@ -42,7 +48,7 @@ namespace DCPE
 				message.resize(dimensions);
 				for (auto i = 0; i < dimensions; i++)
 				{
-					message[i] = (double)rand() / RAND_MAX;
+					message[i] = get_random_double(-1000.0, +1000.0);
 				}
 
 				auto ciphertext = scheme->encrypt(key, message);
