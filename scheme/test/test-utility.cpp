@@ -189,14 +189,14 @@ namespace DCPE
 		}
 
 		auto keys = hmac_256_keygen(hash_key);
-		ASSERT_NE(EVP_PKEY_cmp(keys.first, keys.second), 0);
+		ASSERT_NE(EVP_PKEY_cmp(keys.first, keys.second), 1);
 	}
 
 	TEST_F(UtilityTest, HmacKeygenTwoKeys)
 	{
 		auto keys = hmac_256_keygen();
 
-		ASSERT_NE(EVP_PKEY_cmp(keys.first, keys.second), 0);
+		ASSERT_NE(EVP_PKEY_cmp(keys.first, keys.second), 1);
 	}
 
 	TEST_F(UtilityTest, HmacKeygenSame)
@@ -220,8 +220,8 @@ namespace DCPE
 		auto first	= hmac_256_keygen();
 		auto second = hmac_256_keygen();
 
-		ASSERT_EQ(EVP_PKEY_cmp(first.first, second.first), 0);
-		ASSERT_EQ(EVP_PKEY_cmp(first.second, second.second), 0);
+		ASSERT_NE(EVP_PKEY_cmp(first.first, second.first), 1);
+		ASSERT_NE(EVP_PKEY_cmp(first.second, second.second), 1);
 	}
 
 	TEST_F(UtilityTest, HmacSignVerify)
