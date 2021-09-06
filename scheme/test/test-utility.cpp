@@ -179,7 +179,7 @@ namespace DCPE
 		}
 	}
 
-	TEST_F(UtilityTest, HmacKeygenGivenHashKey)
+	TEST_F(UtilityTest, DISABLED_HmacKeygenGivenHashKey)
 	{
 		bytes hash_key;
 		auto key_size = EVP_MD_size(EVP_get_digestbyname("SHA256"));
@@ -192,7 +192,7 @@ namespace DCPE
 		ASSERT_NE(EVP_PKEY_cmp(keys.first, keys.second), 1);
 	}
 
-	TEST_F(UtilityTest, HmacKeygenTwoKeys)
+	TEST_F(UtilityTest, DISABLED_HmacKeygenTwoKeys)
 	{
 		auto keys = hmac_256_keygen();
 
@@ -249,6 +249,18 @@ namespace DCPE
 			verified = hmac_256_verify(keys.second, message, different_signature);
 			ASSERT_FALSE(verified);
 		}
+	}
+
+	TEST_F(UtilityTest, DistanceSimple)
+	{
+		auto result = distance({1, 0, 5}, {0, 2, 4});
+
+		ASSERT_EQ(sqrt(6), result);
+	}
+
+	TEST_F(UtilityTest, DistanceVectorsDifferentSize)
+	{
+		EXPECT_THROW({ distance({1, 0, 5}, {0, 2, 4, 5}); }, Exception);
 	}
 }
 

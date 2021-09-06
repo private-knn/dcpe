@@ -96,4 +96,13 @@ namespace DCPE
 	 * @return false otherwise
 	 */
 	bool hmac_256_verify(prf_key key, bytes message, bytes signature);
+
+	/**
+	 * @brief computes Euclidean distance between two vectors
+	 *
+	 * @param first first vector argument
+	 * @param second second vector argument
+	 * @return double the Euclidean distance
+	 */
+	double distance(vector<double> first, vector<double> second);
 }

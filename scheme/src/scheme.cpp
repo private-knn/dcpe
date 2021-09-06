@@ -16,7 +16,7 @@ namespace DCPE
 	key Scheme::keygen()
 	{
 		auto K = hmac_256_keygen();
-		auto s = get_ramdom_number(max_s);
+		auto s = get_ramdom_number(max_s - 1) + 1;
 
 		return {K.first, s};
 	}

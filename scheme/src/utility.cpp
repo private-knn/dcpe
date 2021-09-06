@@ -255,4 +255,20 @@ namespace DCPE
 
 		return result;
 	}
+
+	double distance(vector<double> first, vector<double> second)
+	{
+		if (first.size() != second.size())
+		{
+			throw Exception(boost::format("distance: vectors of different lengths (%d vs %d)") % first.size() % second.size());
+		}
+
+		auto result = 0.0;
+		for (size_t i = 0; i < first.size(); i++)
+		{
+			result += (first[i] - second[i]) * (first[i] - second[i]);
+		}
+
+		return sqrt(result);
+	}
 }
