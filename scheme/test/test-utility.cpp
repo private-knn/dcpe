@@ -2,6 +2,7 @@
 #include "utility.hpp"
 
 #include "gtest/gtest.h"
+#include <cmath>
 #include <numeric>
 
 using namespace std;
