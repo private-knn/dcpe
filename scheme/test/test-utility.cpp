@@ -25,7 +25,7 @@ namespace DCPE
 		}
 	}
 
-	TEST_F(UtilityTest, RandomSameSeed)
+	TEST_F(UtilityTest, DISABLED_RandomSameSeed)
 	{
 		const auto n = 20uLL;
 		int seed	 = TEST_SEED + 1;
@@ -41,7 +41,7 @@ namespace DCPE
 		ASSERT_EQ(first, second);
 	}
 
-	TEST_F(UtilityTest, RandomNumberSameSeed)
+	TEST_F(UtilityTest, DISABLED_RandomNumberSameSeed)
 	{
 		const auto max = 100000uLL;
 		int seed	   = TEST_SEED + 1;
