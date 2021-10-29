@@ -32,6 +32,9 @@ DEPS = $(patsubst %, $(IDIR)/%, $(_DEPS))
 _OBJ = $(addsuffix .o, $(ENTITIES))
 OBJ = $(patsubst %, $(ODIR)/%, $(_OBJ))
 
+TARGETS = faiss
+TARGETBIN = $(addprefix $(BDIR)/, $(TARGETS))
+
 TESTS = $(ENTITIES)
 TESTBIN = $(addprefix $(BDIR)/test-, $(TESTS))
 JUNITS= $(foreach test, $(TESTS), bin/test-$(test)?--gtest_output=xml:junit-$(test).xml)
@@ -57,6 +60,10 @@ profile: clean run-tests-junit
 # executables
 
 .SECONDEXPANSION:
+$(TARGETBIN): $(OBJ) $$(subst $$(BDIR), $(SDIR), $$@).cpp
+	$(ENTRYPOINTCC)
+
+.SECONDEXPANSION:
 $(TESTBIN): $(OBJ) $$(subst $$(BDIR), $(TDIR), $$@).cpp
 	$(ENTRYPOINTCC)
 
@@ -74,6 +81,11 @@ shared-debug: shared
 shared: CPPFLAGS += -DSHARED -O3
 shared: $(OBJ)
 	$(CC) -shared $(LDLIBS) $(LDFLAGS) -o $(BDIR)/lib$(LIBNAME).so $(OBJ)
+
+# programs
+
+faiss: LDLIBS += -l faiss
+faiss: bin/faiss
 
 # objects
 
