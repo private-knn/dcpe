@@ -9,39 +9,37 @@ LDIR=lib
 BDIR=bin
 
 LDFLAGS=-L $(LDIR) -L /usr/local/opt/openssl/lib
-LDLIBS=-l faiss -l dcpe # libs for main code
+LDLIBS=-l boost_system -l ssl -l crypto # libs for main code
 LDTESTLIBS=-l gtest -l pthread -l benchmark # libs for tests and benchmarks
 
-INCLUDES=-I $(IDIR) -I $(LDIR)/include -I /usr/local/opt/openssl/include
+INCLUDES=-I $(IDIR) -I /usr/local/opt/openssl/include
 override CPPFLAGS += --std=c++17 -Wall -Wno-unknown-pragmas -fPIC
 CC=g++
 RM=rm -rf
 
-LIB_DCPE_DIR=../scheme
-
-LIBNAME=nn
+LIBNAME=dcpe
 
 # if you follow the convention that for each class CLASS you have a header in
 # $(IDIR)/CLASS.hpp, a code in $(SDIR)/CLASS.cpp and a test in $(TDIR)/test-CLASS.cpp,
 # then the rest will magically work - it will compile each class and test and will run the tests.
 # CLASS does not even have to be a class in C++.
-ENTITIES =
+ENTITIES = utility scheme
 
 # dependencies - definitions plus header files
-_DEPS = $(addsuffix .hpp, $(ENTITIES))
+_DEPS = definitions.h $(addsuffix .hpp, $(ENTITIES))
 DEPS = $(patsubst %, $(IDIR)/%, $(_DEPS))
 
 _OBJ = $(addsuffix .o, $(ENTITIES))
 OBJ = $(patsubst %, $(ODIR)/%, $(_OBJ))
 
-TARGETS = accuracy
+TARGETS = faiss
 TARGETBIN = $(addprefix $(BDIR)/, $(TARGETS))
 
-TESTS =
+TESTS = $(ENTITIES)
 TESTBIN = $(addprefix $(BDIR)/test-, $(TESTS))
 JUNITS= $(foreach test, $(TESTS), bin/test-$(test)?--gtest_output=xml:junit-$(test).xml)
 
-BENCHMARKS =
+BENCHMARKS = $(ENTITIES)
 BENCHMARKSBIN = $(addprefix $(BDIR)/benchmark-, $(BENCHMARKS))
 
 ENTRYPOINTCC = $(CC) -o $@ $^ $(CPPFLAGS) $(INCLUDES) $(LDLIBS) $(LDTESTLIBS) $(LDFLAGS)
@@ -50,7 +48,7 @@ ENTRYPOINTCC = $(CC) -o $@ $^ $(CPPFLAGS) $(INCLUDES) $(LDLIBS) $(LDTESTLIBS) $(
 
 all: shared docs
 
-binaries: $(TARGETBIN)
+binaries: $(TESTBIN) $(BENCHMARKSBIN)
 cleandebug: clean debug
 
 debug: CPPFLAGS += -g -DTESTING
@@ -86,7 +84,8 @@ shared: $(OBJ)
 
 # programs
 
-accuracy: bin/accuracy
+faiss: LDLIBS += -l faiss
+faiss: bin/faiss
 
 # objects
 
@@ -121,19 +120,6 @@ coverage: profile
 	mkdir -p coverage-html/
 	gcovr -r . --html --html-details -o coverage-html/index.html
 	gcovr -r . -x -o cobertura.xml
-
-copy-libs-dev: LIB_DCPE_DIR=../../scheme/scheme
-copy-libs-dev: copy-libs
-
-copy-libs:
-	@rm -rf $(LDIR)/*
-	@mkdir -p $(LDIR)/include/dcpe
-	@cp $(LIB_DCPE_DIR)/bin/libdcpe.so $(LDIR)
-	@cp $(LIB_DCPE_DIR)/include/* $(LDIR)/include/dcpe
-	@cp $(LDIR)/lib*.so $(BDIR)
-
-install-libs:
-	cp $(LDIR)/lib*.so /usr/lib/
 
 docs: clean-docs
 	doxygen ../Doxyfile
