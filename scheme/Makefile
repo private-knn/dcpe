@@ -32,7 +32,7 @@ DEPS = $(patsubst %, $(IDIR)/%, $(_DEPS))
 _OBJ = $(addsuffix .o, $(ENTITIES))
 OBJ = $(patsubst %, $(ODIR)/%, $(_OBJ))
 
-TARGETS = faiss
+TARGETS =
 TARGETBIN = $(addprefix $(BDIR)/, $(TARGETS))
 
 TESTS = $(ENTITIES)
@@ -83,9 +83,6 @@ shared: $(OBJ)
 	$(CC) -shared $(LDLIBS) $(LDFLAGS) -o $(BDIR)/lib$(LIBNAME).so $(OBJ)
 
 # programs
-
-faiss: LDLIBS += -l faiss
-faiss: bin/faiss
 
 # objects
 
