@@ -11,5 +11,8 @@ cobertura.xml
 coverage-html/
 docs/
 ipch
-scheme/bin/*
-!scheme/bin/.gitkeep
+nearest-neighbor/bin/*
+!nearest-neighbor/bin/.gitkeep
+nearest-neighbor/lib/*
+!nearest-neighbor/lib/.gitkeep
+

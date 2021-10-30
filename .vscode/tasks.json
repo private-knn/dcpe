@@ -6,7 +6,7 @@
 		"command": "make debug -j8",
 		"args": [],
 		"options": {
-			"cwd": "${workspaceFolder}/scheme"
+			"cwd": "${workspaceFolder}/nearest-neighbor"
 		},
 		"group": {
 			"kind": "build",

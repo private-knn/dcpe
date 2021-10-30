@@ -1,137 +1,22 @@
 stages:
   - build
-  - test
-  - release
-  - deploy
 
 variables:
-  PROJECT_DIR: "scheme"
-  CI_REF: &ref 85f8a6f6305719f3c234b5368fa8f7e5ce5d099c
+  PROJECT_DIR: "nearest-neighbor"
 
 build-binaries:
   image: dbogatov/docker-images:pbc-latest
   stage: build
   script:
+    - ls -la
     - cd ./$PROJECT_DIR
-    - make binaries shared
-  artifacts:
-    expire_in: 30 min
-    paths:
-      - ./$PROJECT_DIR/bin/*.so
-      - ./$PROJECT_DIR/include/
+    - ls -la
+    - make clean copy-libs install-libs binaries
+    - ./bin/accuracy
+  needs:
+    - project: bu/dcpe/scheme
+      job: release-library
+      ref: master
+      artifacts: true
   tags:
     - docker
-
-build-docs:
-  image: dbogatov/docker-images:doxygen-latest
-  stage: build
-  script:
-    - cd ./$PROJECT_DIR
-    - doxygen ../Doxyfile
-  artifacts:
-    expire_in: 30 min
-    paths:
-      - ./docs
-      - Dockerfile
-      - nginx.conf
-  tags:
-    - docker
-
-unit-test:
-  image: dbogatov/docker-images:pbc-latest
-  stage: test
-  script:
-    - cd ./$PROJECT_DIR/
-    - make coverage
-  dependencies: []
-  coverage: /^TOTAL.*\s+(\d+\%)$/
-  artifacts:
-    expire_in: 1 day
-    paths:
-      - ./$PROJECT_DIR/coverage-html/
-    reports:
-      junit: ./$PROJECT_DIR/junit-*.xml
-      cobertura: ./$PROJECT_DIR/cobertura.xml
-  tags:
-    - docker
-
-benchmarks:
-  image: dbogatov/docker-images:pbc-latest
-  services:
-    - redis:5
-    - aerospike:latest
-  stage: test
-  script:
-    - cd ./$PROJECT_DIR/
-    - make run-benchmarks
-  dependencies: []
-  tags:
-    - docker
-
-# shared-library:
-#   image: dbogatov/docker-images:pbc-latest
-#   stage: test
-#   script:
-#     - cd ./$PROJECT_DIR/
-#     - make shared ldconfig run-shared-lib
-#   dependencies: []
-#   tags:
-#     - docker
-
-release-library:
-  image: dbogatov/docker-images:alpine-extras-latest
-  variables:
-    GIT_STRATEGY: none
-  stage: release
-  script:
-    - echo "re-upload artifacts"
-  artifacts:
-    expire_in: 30 days
-    paths:
-      - ./$PROJECT_DIR/bin/*.so
-      - ./$PROJECT_DIR/include/
-  dependencies:
-    - build-binaries
-  tags:
-    - docker
-  only:
-    - master
-
-docs-website:
-  variables:
-    GIT_STRATEGY: none
-  stage: release
-  script:
-    - docker build -t $CI_REGISTRY/$CI_PROJECT_PATH:$CI_BUILD_REF_NAME .
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker push $CI_REGISTRY/$CI_PROJECT_PATH:$CI_BUILD_REF_NAME
-  dependencies:
-    - build-docs
-  tags:
-    - shell
-  only:
-    - master
-
-pages:
-  image: dbogatov/docker-images:alpine-extras-latest
-  variables:
-    GIT_STRATEGY: none
-  stage: release
-  script:
-    - mv docs/html public/
-    - echo "Uploading files to pages"
-  artifacts:
-    expire_in: 30 min
-    paths:
-      - public
-  dependencies:
-    - build-docs
-  tags:
-    - docker
-  only:
-    - master
-# include:
-#   # DEPLOY
-#   - project: "templates/ci-snippets"
-#     file: "trigger-websites-deploy.yml"
-#     ref: *ref
