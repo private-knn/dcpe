@@ -9,7 +9,7 @@ variables:
   CI_REF: &ref 85f8a6f6305719f3c234b5368fa8f7e5ce5d099c
 
 build-binaries:
-  image: dbogatov/docker-images:pbc-latest
+  image: dbogatov/docker-images:faiss-latest
   stage: build
   script:
     - cd ./$PROJECT_DIR
@@ -38,7 +38,7 @@ build-docs:
     - docker
 
 unit-test:
-  image: dbogatov/docker-images:pbc-latest
+  image: dbogatov/docker-images:faiss-latest
   stage: test
   script:
     - cd ./$PROJECT_DIR/
@@ -56,10 +56,7 @@ unit-test:
     - docker
 
 benchmarks:
-  image: dbogatov/docker-images:pbc-latest
-  services:
-    - redis:5
-    - aerospike:latest
+  image: dbogatov/docker-images:faiss-latest
   stage: test
   script:
     - cd ./$PROJECT_DIR/
