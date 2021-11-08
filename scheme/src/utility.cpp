@@ -74,7 +74,7 @@ namespace DCPE
 		return material[0];
 	}
 
-	double sample_uniform(const double min, const double max, const number seed)
+	VALUE_T sample_uniform(const VALUE_T min, const VALUE_T max, const number seed)
 	{
 		base_generator_type generator(seed);
 
@@ -84,14 +84,14 @@ namespace DCPE
 		return sampler();
 	}
 
-	vector<double> sample_normal_series(const double mean, const double variance, const number seed, const number count)
+	vector<VALUE_T> sample_normal_series(const VALUE_T mean, const VALUE_T variance, const number seed, const number count)
 	{
 		base_generator_type generator(seed);
 
 		boost::normal_distribution<> distribution(mean, variance);
 		boost::variate_generator<base_generator_type &, boost::normal_distribution<>> sampler(generator, distribution);
 
-		vector<double> samples;
+		vector<VALUE_T> samples;
 		samples.resize(count);
 
 		for (auto i = 0; i < count; i++)
@@ -102,7 +102,7 @@ namespace DCPE
 		return samples;
 	}
 
-	vector<double> sample_normal_multivariate_identity(const double mean, const number dimensions, const number seed)
+	vector<VALUE_T> sample_normal_multivariate_identity(const VALUE_T mean, const number dimensions, const number seed)
 	{
 		auto samples = sample_normal_series(0.0, 1.0, seed, dimensions);
 
@@ -256,7 +256,7 @@ namespace DCPE
 		return result;
 	}
 
-	double distance(vector<double> first, vector<double> second)
+	VALUE_T distance(vector<VALUE_T> first, vector<VALUE_T> second)
 	{
 		if (first.size() != second.size())
 		{

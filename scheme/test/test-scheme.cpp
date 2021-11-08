@@ -33,9 +33,9 @@ namespace DCPE
 		const auto runs	 = 1000;
 		const auto error = 1.0;
 
-		auto get_random_double = [](auto min, auto max)
+		auto get_random_VALUE_T = [](auto min, auto max)
 		{
-			double f = (double)rand() / RAND_MAX;
+			VALUE_T f = (VALUE_T)rand() / RAND_MAX;
 			return min + f * (max - min);
 		};
 
@@ -45,16 +45,20 @@ namespace DCPE
 			{
 				auto key = scheme->keygen();
 
-				vector<double> message;
+				vector<VALUE_T> message;
 				message.resize(dimensions);
 				for (auto i = 0; i < dimensions; i++)
 				{
-					message[i] = get_random_double(-1000.0, +1000.0);
+					message[i] = get_random_VALUE_T(-1000.0, +1000.0);
 				}
 
-				auto ciphertext = scheme->encrypt(key, message);
+				vector<VALUE_T> ciphertext;
+				ciphertext.resize(dimensions);
+				auto nonce = scheme->encrypt(key, TO_ARRAY(message), dimensions, TO_ARRAY(ciphertext));
 
-				auto decrypted = scheme->decrypt(key, ciphertext);
+				vector<VALUE_T> decrypted;
+				decrypted.resize(dimensions);
+				scheme->decrypt(key, TO_ARRAY(ciphertext), dimensions, nonce, TO_ARRAY(decrypted));
 
 				for (auto i = 0; i < dimensions; i++)
 				{
@@ -70,16 +74,16 @@ namespace DCPE
 
 		auto get_random_vector = [](auto dimensions, auto min, auto max)
 		{
-			vector<double> result;
+			vector<VALUE_T> result;
 			result.resize(dimensions);
 			for (auto i = 0; i < dimensions; i++)
 			{
-				result[i] = min + ((double)rand() / RAND_MAX) * (max - min);
+				result[i] = min + ((VALUE_T)rand() / RAND_MAX) * (max - min);
 			}
 			return result;
 		};
 
-		auto check_implication = [](double d1, double d2, double df1, double df2)
+		auto check_implication = [](VALUE_T d1, VALUE_T d2, VALUE_T df1, VALUE_T df2)
 		{
 			if (d1 < d2 - beta)
 			{
@@ -101,9 +105,14 @@ namespace DCPE
 				auto y = get_random_vector(dimensions, -1000.0, +1000.0);
 				auto z = get_random_vector(dimensions, -1000.0, +1000.0);
 
-				auto f_x = scheme->encrypt(key, x).first;
-				auto f_y = scheme->encrypt(key, y).first;
-				auto f_z = scheme->encrypt(key, z).first;
+				vector<VALUE_T> f_x, f_y, f_z;
+				f_x.resize(dimensions);
+				f_y.resize(dimensions);
+				f_z.resize(dimensions);
+
+				scheme->encrypt(key, TO_ARRAY(x), dimensions, TO_ARRAY(f_x));
+				scheme->encrypt(key, TO_ARRAY(y), dimensions, TO_ARRAY(f_y));
+				scheme->encrypt(key, TO_ARRAY(z), dimensions, TO_ARRAY(f_z));
 
 				auto xy = distance(x, y);
 				auto yz = distance(y, z);

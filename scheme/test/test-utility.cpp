@@ -88,7 +88,7 @@ namespace DCPE
 		const auto runs	 = 100000uLL;
 		const auto error = runs * 0.01;
 
-		vector<double> samples;
+		vector<VALUE_T> samples;
 		for (number i = 0; i < runs; i++)
 		{
 			auto sample = sample_uniform(min, max, seed + i);
@@ -98,13 +98,13 @@ namespace DCPE
 			ASSERT_LE(sample, max);
 		}
 
-		double sum	= std::accumulate(samples.begin(), samples.end(), 0.0);
-		double mean = sum / samples.size();
+		VALUE_T sum	 = std::accumulate(samples.begin(), samples.end(), 0.0);
+		VALUE_T mean = sum / samples.size();
 
 		ASSERT_NEAR(mean, (max - min) / 2, error);
 
-		double sq_sum	= std::inner_product(samples.begin(), samples.end(), samples.begin(), 0.0);
-		double variance = sq_sum / samples.size() - mean * mean;
+		VALUE_T sq_sum	 = std::inner_product(samples.begin(), samples.end(), samples.begin(), 0.0);
+		VALUE_T variance = sq_sum / samples.size() - mean * mean;
 
 		ASSERT_NEAR(variance, (max - min) * (max - min) / 12.0, error);
 	}
@@ -144,13 +144,13 @@ namespace DCPE
 
 		auto samples = sample_normal_series(mu, sigma_sq, seed, runs);
 
-		double sum	= std::accumulate(samples.begin(), samples.end(), 0.0);
-		double mean = sum / samples.size();
+		VALUE_T sum	 = std::accumulate(samples.begin(), samples.end(), 0.0);
+		VALUE_T mean = sum / samples.size();
 
 		ASSERT_NEAR(mean, mu, error);
 
-		double sq_sum	= std::inner_product(samples.begin(), samples.end(), samples.begin(), 0.0);
-		double variance = sq_sum / samples.size() - mean * mean;
+		VALUE_T sq_sum	 = std::inner_product(samples.begin(), samples.end(), samples.begin(), 0.0);
+		VALUE_T variance = sq_sum / samples.size() - mean * mean;
 
 		ASSERT_NEAR(variance, sigma_sq, error);
 	}
@@ -256,7 +256,7 @@ namespace DCPE
 	{
 		auto result = distance({1, 0, 5}, {0, 2, 4});
 
-		ASSERT_EQ(sqrt(6), result);
+		ASSERT_NEAR(sqrt(6), result, 0.0000001);
 	}
 
 	TEST_F(UtilityTest, DistanceVectorsDifferentSize)

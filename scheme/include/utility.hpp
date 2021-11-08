@@ -40,9 +40,9 @@ namespace DCPE
 	 * @param min the left endpoint of the distribution (inclusive)
 	 * @param max the right endpoint of the distribution (inclusive)
 	 * @param seed the seed value to supply to pseudo-random generator for coins
-	 * @return double the sample value
+	 * @return VALUE_T the sample value
 	 */
-	double sample_uniform(const double min, const double max, const number seed);
+	VALUE_T sample_uniform(const VALUE_T min, const VALUE_T max, const number seed);
 
 	/**
 	 * @brief Samples a series of normal values using random coins from the seed
@@ -51,9 +51,9 @@ namespace DCPE
 	 * @param variance the sigma squared parameter of the distribution
 	 * @param seed the seed value to supply to pseudo-random generator for coins
 	 * @param count the number of samples to return
-	 * @return vector<double> the sample values
+	 * @return vector<VALUE_T> the sample values
 	 */
-	vector<double> sample_normal_series(const double mean, const double variance, const number seed, const number count);
+	vector<VALUE_T> sample_normal_series(const VALUE_T mean, const VALUE_T variance, const number seed, const number count);
 
 	/**
 	 * @brief Samples a value from a Multivariate Normal distribution with variance identity matrix.
@@ -64,9 +64,9 @@ namespace DCPE
 	 * @param mean the mu parameter of the distribution
 	 * @param dimensions the number of dimensions in the distribution
 	 * @param seed the seed value to supply to pseudo-random generator for coins
-	 * @return vector<double> the sample value
+	 * @return vector<VALUE_T> the sample value
 	 */
-	vector<double> sample_normal_multivariate_identity(const double mean, const number dimensions, const number seed);
+	vector<VALUE_T> sample_normal_multivariate_identity(const VALUE_T mean, const number dimensions, const number seed);
 
 	/**
 	 * @brief Generates a pair of keys to be used in HMAC sign and verify routines
@@ -102,7 +102,7 @@ namespace DCPE
 	 *
 	 * @param first first vector argument
 	 * @param second second vector argument
-	 * @return double the Euclidean distance
+	 * @return VALUE_T the Euclidean distance
 	 */
-	double distance(vector<double> first, vector<double> second);
+	VALUE_T distance(vector<VALUE_T> first, vector<VALUE_T> second);
 }

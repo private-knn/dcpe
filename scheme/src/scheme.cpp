@@ -21,41 +21,31 @@ namespace DCPE
 		return {K.first, s};
 	}
 
-	pair<vector<double>, bytes> Scheme::encrypt(key key, vector<double> message)
+	bytes Scheme::encrypt(key& key, const VALUE_T* message, size_t dimensions, VALUE_T* ciphertext)
 	{
-		const auto dimensions = message.size();
-
 		auto nonce = get_random_bytes(l);
 
 		auto lambda_m = compute_lambda_m(key, nonce, dimensions);
 
-		vector<double> c;
-		c.resize(dimensions);
 		for (auto i = 0; i < dimensions; i++)
 		{
-			c[i] = message[i] * key.second + lambda_m[i];
+			ciphertext[i] = message[i] * key.second + lambda_m[i];
 		}
 
-		return {c, nonce};
+		return nonce;
 	}
 
-	vector<double> Scheme::decrypt(key key, pair<vector<double>, bytes> ciphertext)
+	void Scheme::decrypt(key& key, const VALUE_T* ciphertext, size_t dimensions, bytes& nonce, VALUE_T* message)
 	{
-		const auto dimensions = ciphertext.first.size();
+		auto lambda_m = compute_lambda_m(key, nonce, dimensions);
 
-		auto lambda_m = compute_lambda_m(key, ciphertext.second, dimensions);
-
-		vector<double> message;
-		message.resize(dimensions);
 		for (auto i = 0; i < dimensions; i++)
 		{
-			message[i] = (ciphertext.first[i] - lambda_m[i]) / key.second;
+			message[i] = (ciphertext[i] - lambda_m[i]) / key.second;
 		}
-
-		return message;
 	}
 
-	vector<double> Scheme::compute_lambda_m(key key, bytes nonce, size_t dimensions)
+	vector<VALUE_T> Scheme::compute_lambda_m(key& key, bytes& nonce, size_t dimensions)
 	{
 		auto tape = hmac_256_sign(key.first, nonce);
 
@@ -65,7 +55,7 @@ namespace DCPE
 
 		auto x = pow(x_prime, 1.0 / dimensions);
 
-		vector<double> lambda_m;
+		vector<VALUE_T> lambda_m;
 		lambda_m.resize(dimensions);
 		auto norm = sqrt(inner_product(u.begin(), u.end(), u.begin(), 0.0));
 		for (auto i = 0; i < dimensions; i++)

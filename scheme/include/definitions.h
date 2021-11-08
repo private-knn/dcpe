@@ -11,6 +11,8 @@
 
 #define TO_ARRAY(x) &x[0]
 
+#define VALUE_T float
+
 namespace DCPE
 {
 	using namespace std;

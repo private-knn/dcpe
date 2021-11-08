@@ -38,16 +38,19 @@ namespace DCPE
 
 		auto dimensions = state.range(0);
 
-		vector<double> message;
+		vector<VALUE_T> message;
 		message.resize(dimensions);
 		for (auto i = 0; i < dimensions; i++)
 		{
-			message[i] = (double)rand() / RAND_MAX;
+			message[i] = (VALUE_T)rand() / RAND_MAX;
 		}
+
+		vector<VALUE_T> ciphertext;
+		ciphertext.resize(dimensions);
 
 		for (auto _ : state)
 		{
-			benchmark::DoNotOptimize(scheme->encrypt(key, message));
+			benchmark::DoNotOptimize(scheme->encrypt(key, TO_ARRAY(message), dimensions, TO_ARRAY(ciphertext)));
 		}
 	}
 
@@ -58,17 +61,21 @@ namespace DCPE
 
 		auto dimensions = state.range(0);
 
-		vector<double> message;
+		vector<VALUE_T> message;
 		message.resize(dimensions);
 		for (auto i = 0; i < dimensions; i++)
 		{
-			message[i] = (double)rand() / RAND_MAX;
+			message[i] = (VALUE_T)rand() / RAND_MAX;
 		}
-		auto ciphertext = scheme->encrypt(key, message);
+
+		vector<VALUE_T> ciphertext;
+		ciphertext.resize(dimensions);
+
+		auto nonce = scheme->encrypt(key, TO_ARRAY(message), dimensions, TO_ARRAY(ciphertext));
 
 		for (auto _ : state)
 		{
-			benchmark::DoNotOptimize(scheme->decrypt(key, ciphertext));
+			scheme->decrypt(key, TO_ARRAY(ciphertext), dimensions, nonce, TO_ARRAY(message));
 		}
 	}
 
