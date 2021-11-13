@@ -105,4 +105,8 @@ namespace DCPE
 	 * @return VALUE_T the Euclidean distance
 	 */
 	VALUE_T distance(vector<VALUE_T> first, vector<VALUE_T> second);
+
+	void store_key(key key, string path);
+
+	key load_key(string path);
 }

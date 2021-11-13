@@ -7,6 +7,7 @@
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <iomanip>
+#include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/pem.h>
 #include <openssl/rand.h>
@@ -270,5 +271,26 @@ namespace DCPE
 		}
 
 		return sqrt(result);
+	}
+
+	void store_key(key key, string path)
+	{
+		// https://stackoverflow.com/a/12661380/1644554
+
+		FILE *file = fopen(path.c_str(), "w+");
+		if (NULL == file)
+		{
+			throw Exception(boost::format("store_key: could not create file %s") % path);
+		}
+
+		if (!PEM_write_PrivateKey(file, key.first, NULL, NULL, 0, 0, NULL))
+		{
+			throw Exception(boost::format("store_key: could not write key to file %s") % path);
+		}
+		fclose(file);
+	}
+
+	key load_key(string path)
+	{
 	}
 }
