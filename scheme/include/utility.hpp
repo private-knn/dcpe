@@ -106,7 +106,5 @@ namespace DCPE
 	 */
 	VALUE_T distance(vector<VALUE_T> first, vector<VALUE_T> second);
 
-	void store_key(key key, string path);
-
-	key load_key(string path);
+	string key_to_string(EVP_PKEY *key);
 }

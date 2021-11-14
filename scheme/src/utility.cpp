@@ -123,20 +123,20 @@ namespace DCPE
 
 	prf_keys hmac_256_keygen(bytes hash_key)
 	{
-		size_t size;
+		auto md	  = EVP_get_digestbyname("SHA256");
+		auto size = EVP_MD_size(md);
+
 		if (hash_key.size() == 0)
 		{
-			auto md	 = EVP_get_digestbyname("SHA256");
-			size	 = EVP_MD_size(md);
 			hash_key = get_random_bytes(size);
 		}
-		else
+		else if (hash_key.size() != size)
 		{
-			size = hash_key.size();
+			throw Exception(boost::format("hmac_256_keygen: wrong hash key size %d, must be 0 or %d") % hash_key.size() % size);
 		}
 
-		auto signing_key   = EVP_PKEY_new_mac_key(EVP_PKEY_HMAC, NULL, TO_ARRAY(hash_key), size);
-		auto verifying_key = EVP_PKEY_new_mac_key(EVP_PKEY_HMAC, NULL, TO_ARRAY(hash_key), size);
+		auto signing_key   = EVP_PKEY_new_raw_private_key(EVP_PKEY_HMAC, NULL, TO_ARRAY(hash_key), size);
+		auto verifying_key = EVP_PKEY_new_raw_private_key(EVP_PKEY_HMAC, NULL, TO_ARRAY(hash_key), size);
 
 		return {signing_key, verifying_key};
 	}
@@ -273,24 +273,35 @@ namespace DCPE
 		return sqrt(result);
 	}
 
-	void store_key(key key, string path)
+	string key_to_string(EVP_PKEY *key)
 	{
-		// https://stackoverflow.com/a/12661380/1644554
+		auto len = 10512;
 
-		FILE *file = fopen(path.c_str(), "w+");
-		if (NULL == file)
+		auto *bio = BIO_new(BIO_s_mem());
+		auto pem  = (char *)malloc(len + 1);
+
+		// auto res = PEM_write_bio_PrivateKey(
+		// 	bio,  /* BIO to write the private key to */
+		// 	key,  /* EVP_PKEY structure */
+		// 	NULL, /* default cipher for encrypting the key on disk */
+		// 	NULL, /* passphrase required for decrypting the key on disk */
+		// 	0,	  /* length of the passphrase string */
+		// 	NULL, /* callback for requesting a password */
+		// 	NULL  /* data to pass to the callback */
+		// );
+		auto res = PEM_write_bio_PUBKEY(
+			bio,  /* BIO to write the private key to */
+			key  /* EVP_PKEY structure */
+		);
+		if (!res)
 		{
-			throw Exception(boost::format("store_key: could not create file %s") % path);
+			throw Exception("Error");
 		}
 
-		if (!PEM_write_PrivateKey(file, key.first, NULL, NULL, 0, 0, NULL))
-		{
-			throw Exception(boost::format("store_key: could not write key to file %s") % path);
-		}
-		fclose(file);
-	}
 
-	key load_key(string path)
-	{
+		// memset(pem, 0, bio->num_write + 1);
+		memset(pem, 0, len + 1);
+
+		return string(pem);
 	}
 }

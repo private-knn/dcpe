@@ -13,10 +13,13 @@ namespace DCPE
 		beta(beta),
 		max_s(max_s) {}
 
-	key Scheme::keygen()
+	key Scheme::keygen(bytes hash_key, number s)
 	{
-		auto K = hmac_256_keygen();
-		auto s = get_ramdom_number(max_s - 1) + 1;
+		auto K = hmac_256_keygen(hash_key);
+		if (s == -1)
+		{
+			s = get_ramdom_number(max_s - 1) + 1;
+		}
 
 		return {K.first, s};
 	}
@@ -47,8 +50,6 @@ namespace DCPE
 
 	vector<VALUE_T> Scheme::compute_lambda_m(key& key, bytes& nonce, size_t dimensions)
 	{
-		auto tape = hmac_256_sign(key.first, nonce);
-
 		auto u = sample_normal_multivariate_identity(0, dimensions, bytes_to_number(nonce.begin()));
 
 		auto x_prime = sample_uniform(0, key.second * beta / 4, bytes_to_number(nonce.begin() + sizeof(number) / sizeof(bytes)));
@@ -64,5 +65,11 @@ namespace DCPE
 		}
 
 		return lambda_m;
+	}
+
+	size_t Scheme::hash_key_size()
+	{
+		auto md = EVP_get_digestbyname("SHA256");
+		return EVP_MD_size(md);
 	}
 }

@@ -264,14 +264,6 @@ namespace DCPE
 	{
 		EXPECT_THROW({ distance({1, 0, 5}, {0, 2, 4, 5}); }, Exception);
 	}
-
-	TEST_F(UtilityTest, StoreLoadKey)
-	{
-		auto scheme = make_unique<Scheme>(10, 100);
-		auto key = scheme->keygen();
-
-		store_key(key, "tmp.pem");
-	}
 }
 
 int main(int argc, char **argv)

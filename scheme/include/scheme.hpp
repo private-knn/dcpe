@@ -41,7 +41,7 @@ namespace DCPE
 		 *
 		 * @return key a pair of PRF key and secret \f$ s \f$ from \f$ \mathcal{S} \f$
 		 */
-		key keygen();
+		key keygen(bytes hash_key = bytes(), number s = -1);
 
 		/**
 		 * @brief encrypts the vector under given key
@@ -64,5 +64,7 @@ namespace DCPE
 		 * @param message the original vector (has to be allocated of length dimensions)
 		 */
 		void decrypt(key& key, const VALUE_T* ciphertext, size_t dimensions, bytes& nonce, VALUE_T* message);
+
+		static size_t hash_key_size();
 	};
 }
