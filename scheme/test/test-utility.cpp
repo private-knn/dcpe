@@ -1,6 +1,6 @@
 #include "definitions.h"
-#include "utility.hpp"
 #include "scheme.hpp"
+#include "utility.hpp"
 
 #include "gtest/gtest.h"
 #include <cmath>
@@ -13,50 +13,6 @@ namespace DCPE
 	class UtilityTest : public ::testing::Test
 	{
 	};
-
-	TEST_F(UtilityTest, RandomNoSeed)
-	{
-		const auto n = 20uLL;
-		for (number i = 0; i < 100; i++)
-		{
-			auto first	= get_random_bytes(n);
-			auto second = get_random_bytes(n);
-
-			ASSERT_NE(first, second);
-		}
-	}
-
-	TEST_F(UtilityTest, DISABLED_RandomSameSeed)
-	{
-		const auto n = 20uLL;
-		int seed	 = TEST_SEED + 1;
-
-		srand(seed);
-
-		auto first = get_random_bytes(n);
-
-		srand(seed);
-
-		auto second = get_random_bytes(n);
-
-		ASSERT_EQ(first, second);
-	}
-
-	TEST_F(UtilityTest, DISABLED_RandomNumberSameSeed)
-	{
-		const auto max = 100000uLL;
-		int seed	   = TEST_SEED + 1;
-
-		srand(seed);
-
-		auto first = get_ramdom_number(max);
-
-		srand(seed);
-
-		auto second = get_ramdom_number(max);
-
-		ASSERT_EQ(first, second);
-	}
 
 	TEST_F(UtilityTest, UniformDifferentSeed)
 	{
@@ -181,78 +137,6 @@ namespace DCPE
 		}
 	}
 
-	TEST_F(UtilityTest, DISABLED_HmacKeygenGivenHashKey)
-	{
-		bytes hash_key;
-		auto key_size = EVP_MD_size(EVP_get_digestbyname("SHA256"));
-		for (size_t i = 0; i < key_size; i++)
-		{
-			hash_key.push_back((byte)i);
-		}
-
-		auto keys = hmac_256_keygen(hash_key);
-		ASSERT_NE(EVP_PKEY_cmp(keys.first, keys.second), 1);
-	}
-
-	TEST_F(UtilityTest, DISABLED_HmacKeygenTwoKeys)
-	{
-		auto keys = hmac_256_keygen();
-
-		ASSERT_NE(EVP_PKEY_cmp(keys.first, keys.second), 1);
-	}
-
-	TEST_F(UtilityTest, HmacKeygenSame)
-	{
-		int seed = TEST_SEED + 1;
-
-		srand(seed);
-
-		auto first = hmac_256_keygen();
-
-		srand(seed);
-
-		auto second = hmac_256_keygen();
-
-		ASSERT_NE(EVP_PKEY_cmp_parameters(first.first, second.first), 0);
-		ASSERT_NE(EVP_PKEY_cmp_parameters(first.second, second.second), 0);
-	}
-
-	TEST_F(UtilityTest, HmacKeygenDifferent)
-	{
-		auto first	= hmac_256_keygen();
-		auto second = hmac_256_keygen();
-
-		ASSERT_NE(EVP_PKEY_cmp(first.first, second.first), 1);
-		ASSERT_NE(EVP_PKEY_cmp(first.second, second.second), 1);
-	}
-
-	TEST_F(UtilityTest, HmacSignVerify)
-	{
-		const auto runs = 100;
-
-		for (auto i = 0; i < runs; i++)
-		{
-			auto message   = get_random_bytes(100);
-			auto keys	   = hmac_256_keygen();
-			auto signature = hmac_256_sign(keys.first, message);
-			auto verified  = hmac_256_verify(keys.second, message, signature);
-
-			ASSERT_TRUE(verified);
-
-			auto different_message = message;
-			different_message[0]++;
-
-			verified = hmac_256_verify(keys.second, different_message, signature);
-			ASSERT_FALSE(verified);
-
-			auto different_signature = signature;
-			different_signature[0]++;
-
-			verified = hmac_256_verify(keys.second, message, different_signature);
-			ASSERT_FALSE(verified);
-		}
-	}
-
 	TEST_F(UtilityTest, DistanceSimple)
 	{
 		auto result = distance({1, 0, 5}, {0, 2, 4});
@@ -263,14 +147,6 @@ namespace DCPE
 	TEST_F(UtilityTest, DistanceVectorsDifferentSize)
 	{
 		EXPECT_THROW({ distance({1, 0, 5}, {0, 2, 4, 5}); }, Exception);
-	}
-
-	TEST_F(UtilityTest, StoreLoadKey)
-	{
-		auto scheme = make_unique<Scheme>(10, 100);
-		auto key = scheme->keygen();
-
-		store_key(key, "tmp.pem");
 	}
 }
 

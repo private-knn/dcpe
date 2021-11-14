@@ -11,15 +11,14 @@ namespace DCPE
 	class SchemeTest : public ::testing::Test
 	{
 		public:
-		inline static const number beta	 = 100;
-		inline static const number max_s = 10000;
+		inline static const number beta = 1 << 20;
 
 		protected:
 		unique_ptr<Scheme> scheme;
 
 		SchemeTest()
 		{
-			this->scheme = make_unique<Scheme>(beta, max_s);
+			this->scheme = make_unique<Scheme>(beta);
 		}
 	};
 

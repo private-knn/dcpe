@@ -24,7 +24,7 @@ namespace DCPE
 	 * @param max the non-inclusive max of the range (min is inclusive 0).
 	 * @return number the resulting number
 	 */
-	number get_ramdom_number(const number max);
+	number get_ramdom_number(const number max = ULLONG_MAX);
 
 	/**
 	 * @brief a helper that composes a value of type "number" from a series of bytes
@@ -69,35 +69,6 @@ namespace DCPE
 	vector<VALUE_T> sample_normal_multivariate_identity(const VALUE_T mean, const number dimensions, const number seed);
 
 	/**
-	 * @brief Generates a pair of keys to be used in HMAC sign and verify routines
-	 *
-	 * @param hash_key an optional base hash key to be used in key derivation.
-	 * Use for debugging and testing.
-	 * @return keys sign and verify keys
-	 */
-	prf_keys hmac_256_keygen(bytes hash_key = bytes());
-
-	/**
-	 * @brief produces an HMAC signature of the given message under given sign key
-	 *
-	 * @param key sign key produced in hmac_256_keygen
-	 * @param message an input to sign
-	 * @return bytes the signature of the input
-	 */
-	bytes hmac_256_sign(prf_key key, bytes message);
-
-	/**
-	 * @brief checks if a signature verifies for given message under given verification key
-	 *
-	 * @param key verification key produced in hmac_256_keygen
-	 * @param message an input that was sign
-	 * @param signature a signature produced in hmac_256_sign
-	 * @return true if signature verifies
-	 * @return false otherwise
-	 */
-	bool hmac_256_verify(prf_key key, bytes message, bytes signature);
-
-	/**
 	 * @brief computes Euclidean distance between two vectors
 	 *
 	 * @param first first vector argument
@@ -105,8 +76,4 @@ namespace DCPE
 	 * @return VALUE_T the Euclidean distance
 	 */
 	VALUE_T distance(vector<VALUE_T> first, vector<VALUE_T> second);
-
-	void store_key(key key, string path);
-
-	key load_key(string path);
 }

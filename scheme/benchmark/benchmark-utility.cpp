@@ -20,7 +20,7 @@ namespace DCPE
 	{
 		for (auto _ : state)
 		{
-			benchmark::DoNotOptimize(get_random_bytes(64));
+			benchmark::DoNotOptimize(get_ramdom_number());
 		}
 	}
 
@@ -46,31 +46,6 @@ namespace DCPE
 		}
 	}
 
-	BENCHMARK_DEFINE_F(UtilityBenchmark, HMACSign)
-	(benchmark::State& state)
-	{
-		auto message = get_random_bytes(100);
-		auto keys	 = hmac_256_keygen();
-
-		for (auto _ : state)
-		{
-			benchmark::DoNotOptimize(hmac_256_sign(keys.first, message));
-		}
-	}
-
-	BENCHMARK_DEFINE_F(UtilityBenchmark, HMACVerify)
-	(benchmark::State& state)
-	{
-		auto message   = get_random_bytes(100);
-		auto keys	   = hmac_256_keygen();
-		auto signature = hmac_256_sign(keys.first, message);
-
-		for (auto _ : state)
-		{
-			benchmark::DoNotOptimize(hmac_256_verify(keys.second, message, signature));
-		}
-	}
-
 	BENCHMARK_REGISTER_F(UtilityBenchmark, Random)
 		->Iterations(1 << 20)
 		->Unit(benchmark::kMicrosecond);
@@ -85,14 +60,6 @@ namespace DCPE
 		->Args({3uLL})
 		->Args({10uLL})
 		->Args({100uLL})
-		->Iterations(1 << 15)
-		->Unit(benchmark::kMicrosecond);
-
-	BENCHMARK_REGISTER_F(UtilityBenchmark, HMACSign)
-		->Iterations(1 << 15)
-		->Unit(benchmark::kMicrosecond);
-
-	BENCHMARK_REGISTER_F(UtilityBenchmark, HMACVerify)
 		->Iterations(1 << 15)
 		->Unit(benchmark::kMicrosecond);
 

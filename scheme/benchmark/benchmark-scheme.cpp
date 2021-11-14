@@ -10,8 +10,7 @@ namespace DCPE
 	class SchemeBenchmark : public ::benchmark::Fixture
 	{
 		public:
-		inline static const number beta	 = 3;
-		inline static const number max_s = 10000;
+		inline static const number beta	 = 1 << 20;
 
 		void SetUp(const ::benchmark::State& state)
 		{
@@ -19,7 +18,7 @@ namespace DCPE
 		}
 
 		protected:
-		unique_ptr<Scheme> scheme = make_unique<Scheme>(beta, max_s);
+		unique_ptr<Scheme> scheme = make_unique<Scheme>(beta);
 	};
 
 	BENCHMARK_DEFINE_F(SchemeBenchmark, KeyGen)

@@ -25,10 +25,7 @@ namespace DCPE
 	using uint	 = unsigned int;
 	using bytes	 = vector<byte>;
 
-	using prf_key  = EVP_PKEY*;
-	using prf_keys = pair<prf_key, prf_key>;
-
-	using key = pair<prf_key, number>;
+	using key = tuple<number, number, number>;
 
 	/**
 	 * @brief Primitive exception class that passes along the excpetion message
