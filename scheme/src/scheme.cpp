@@ -12,7 +12,7 @@ namespace DCPE
 	Scheme::Scheme(number beta) :
 		beta(beta) {}
 
-	key Scheme::keygen(bytes hash_key, number s)
+	key Scheme::keygen()
 	{
 		return {
 			get_ramdom_number(ULLONG_MAX),
@@ -61,11 +61,5 @@ namespace DCPE
 		}
 
 		return lambda_m;
-	}
-
-	size_t Scheme::hash_key_size()
-	{
-		auto md = EVP_get_digestbyname("SHA256");
-		return EVP_MD_size(md);
 	}
 }

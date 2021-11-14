@@ -52,9 +52,9 @@ namespace DCPE
 		/**
 		 * @brief generate a fresh key for the scheme
 		 *
-		 * @return key a pair of PRF key and secret \f$ s \f$ from \f$ \mathcal{S} \f$
+		 * @return keys that can be used for encryption
 		 */
-		key keygen(bytes hash_key = bytes(), number s = -1);
+		key keygen();
 
 		/**
 		 * @brief encrypts the vector under given key

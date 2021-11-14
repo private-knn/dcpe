@@ -27,61 +27,6 @@ namespace DCPE
 		SUCCEED();
 	}
 
-	TEST_F(SchemeTest, SameKeyForSameHash)
-	{
-		auto wrong_size = Scheme::hash_key_size() - 1;
-		EXPECT_THROW(
-			{
-				auto hash_key = get_random_bytes(wrong_size);
-				scheme->keygen(hash_key);
-			},
-			Exception);
-
-		auto size	  = Scheme::hash_key_size();
-		auto hash_key = get_random_bytes(size);
-		auto s		  = 5;
-
-		auto key_one = scheme->keygen();
-		auto key_two = scheme->keygen();
-
-		EXPECT_NE(EVP_PKEY_cmp(key_one.first, key_two.first), 1);
-		EXPECT_NE(key_one.second, key_two.second);
-
-		key_one = scheme->keygen(hash_key);
-		key_two = scheme->keygen(hash_key);
-
-		// EXPECT_EQ(EVP_PKEY_cmp(key_one.first, key_two.first), 1);
-		EXPECT_NE(key_one.second, key_two.second);
-
-		key_one = scheme->keygen(hash_key, s);
-		key_two = scheme->keygen(hash_key, s);
-
-		// EXPECT_EQ(EVP_PKEY_cmp(key_one.first, key_two.first), 1);
-		EXPECT_EQ(key_one.second, key_two.second);
-
-		auto min		= -100.0;
-		auto max		= 100.0;
-		auto dimensions = 10;
-
-		vector<VALUE_T> message;
-		message.resize(dimensions);
-		for (auto i = 0; i < dimensions; i++)
-		{
-			message[i] = min + ((VALUE_T)rand() / RAND_MAX) * (max - min);
-		}
-
-		vector<VALUE_T> ciphertext_one, ciphertext_two;
-		ciphertext_one.resize(dimensions);
-		ciphertext_two.resize(dimensions);
-
-		scheme->encrypt(key_one, TO_ARRAY(message), dimensions, TO_ARRAY(ciphertext_one));
-		scheme->encrypt(key_two, TO_ARRAY(message), dimensions, TO_ARRAY(ciphertext_two));
-
-		// EXPECT_EQ(ciphertext_one, ciphertext_two);
-
-		cout << ": " << key_to_string(key_one.first) << endl;
-	}
-
 	TEST_F(SchemeTest, EncryptDecrypt)
 	{
 		const auto runs	 = 1000;
