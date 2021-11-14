@@ -54,7 +54,7 @@ namespace DCPE
 		 *
 		 * @return key a pair of PRF key and secret \f$ s \f$ from \f$ \mathcal{S} \f$
 		 */
-		key keygen();
+		key keygen(bytes hash_key = bytes(), number s = -1);
 
 		/**
 		 * @brief encrypts the vector under given key
