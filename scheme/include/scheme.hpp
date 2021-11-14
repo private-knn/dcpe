@@ -13,7 +13,7 @@ namespace DCPE
 	class Scheme
 	{
 		private:
-		const number beta;
+		const VALUE_T beta;
 
 		/**
 		 * @brief The max value of \f$ s \f$ part of the key
@@ -47,7 +47,7 @@ namespace DCPE
 		 *
 		 * @param beta the approximation paramter \f$ \beta \f$
 		 */
-		Scheme(number beta);
+		Scheme(VALUE_T beta);
 
 		/**
 		 * @brief generate a fresh key for the scheme

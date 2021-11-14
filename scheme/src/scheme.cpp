@@ -9,7 +9,7 @@ namespace DCPE
 {
 	using namespace std;
 
-	Scheme::Scheme(number beta) :
+	Scheme::Scheme(VALUE_T beta) :
 		beta(beta) {}
 
 	key Scheme::keygen()
@@ -48,7 +48,7 @@ namespace DCPE
 	{
 		auto u = sample_normal_multivariate_identity(0, dimensions, get<0>(key) ^ nonce.first);
 
-		auto x_prime = sample_uniform(0, get<2>(key) * beta / 4, get<1>(key) ^ nonce.second);
+		auto x_prime = sample_uniform(0, (get<2>(key) / 4) * beta, get<1>(key) ^ nonce.second);
 
 		auto x = pow(x_prime, 1.0 / dimensions);
 
