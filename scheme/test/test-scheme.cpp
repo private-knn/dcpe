@@ -11,7 +11,7 @@ namespace DCPE
 	class SchemeTest : public ::testing::Test
 	{
 		public:
-		inline static const number beta = 1 << 20;
+		inline static const number beta = 1 << 10;
 
 		protected:
 		unique_ptr<Scheme> scheme;

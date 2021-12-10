@@ -29,7 +29,9 @@ namespace DCPE
 		 * Thus, the max value of \f$ s \f$ is the largest 32 bit uint.
 		 *
 		 */
-		const number max_s = UINT32_MAX;
+		// const number max_s = UINT32_MAX;
+		// TODO
+		const number max_s = 1000;
 
 		/**
 		 * @brief a helper that computes \f$ \lambda_m \f$ value

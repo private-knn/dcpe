@@ -46,11 +46,13 @@ namespace DCPE
 
 	vector<VALUE_T> Scheme::compute_lambda_m(key& key, pair<number, number>& nonce, size_t dimensions)
 	{
+		auto radius = (get<2>(key) / 4) * beta;
+
 		auto u = sample_normal_multivariate_identity(0, dimensions, get<0>(key) ^ nonce.first);
 
-		auto x_prime = sample_uniform(0, (get<2>(key) / 4) * beta, get<1>(key) ^ nonce.second);
+		auto x_prime = sample_uniform(0, 1, get<1>(key) ^ nonce.second);
 
-		auto x = pow(x_prime, 1.0 / dimensions);
+		auto x = radius * pow(x_prime, 1.0 / dimensions);
 
 		vector<VALUE_T> lambda_m;
 		lambda_m.resize(dimensions);
