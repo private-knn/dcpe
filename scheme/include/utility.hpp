@@ -4,8 +4,6 @@
 
 namespace DCPE
 {
-	using namespace std;
-
 	/**
 	 * @brief generate an array of bytes pseudorandomly
 	 *
@@ -16,7 +14,7 @@ namespace DCPE
 	 * @param size the number of bytes to generate
 	 * @return bytes the resulting bytes
 	 */
-	bytes get_random_bytes(const number size);
+	bytes get_random_bytes(const int size);
 
 	/**
 	 * @brief returns a pseudorandom number
@@ -24,15 +22,7 @@ namespace DCPE
 	 * @param max the non-inclusive max of the range (min is inclusive 0).
 	 * @return number the resulting number
 	 */
-	number get_ramdom_number(const number max = ULLONG_MAX);
-
-	/**
-	 * @brief a helper that composes a value of type "number" from a series of bytes
-	 *
-	 * @param first_byte an iterator at the element of byte vector from which to start collecting bytes
-	 * @return number a resulting concatentation of bytes represented as a number
-	 */
-	number bytes_to_number(bytes::iterator first_byte);
+	ull get_ramdom_ull(const ull max = ULLONG_MAX);
 
 	/**
 	 * @brief Samples a real uniform value [min, max] using random coins from the seed
@@ -42,7 +32,8 @@ namespace DCPE
 	 * @param seed the seed value to supply to pseudo-random generator for coins
 	 * @return VALUE_T the sample value
 	 */
-	VALUE_T sample_uniform(const VALUE_T min, const VALUE_T max, const number seed);
+	template <typename VALUE_T>
+	VALUE_T sample_uniform(const VALUE_T min, const VALUE_T max, const ull seed);
 
 	/**
 	 * @brief Samples a series of normal values using random coins from the seed
@@ -53,7 +44,8 @@ namespace DCPE
 	 * @param count the number of samples to return
 	 * @return vector<VALUE_T> the sample values
 	 */
-	vector<VALUE_T> sample_normal_series(const VALUE_T mean, const VALUE_T variance, const number seed, const number count);
+	template <typename VALUE_T>
+	std::vector<VALUE_T> sample_normal_series(const VALUE_T mean, const VALUE_T variance, const ull seed, const int count);
 
 	/**
 	 * @brief Samples a value from a Multivariate Normal distribution with variance identity matrix.
@@ -66,7 +58,8 @@ namespace DCPE
 	 * @param seed the seed value to supply to pseudo-random generator for coins
 	 * @return vector<VALUE_T> the sample value
 	 */
-	vector<VALUE_T> sample_normal_multivariate_identity(const VALUE_T mean, const number dimensions, const number seed);
+	template <typename VALUE_T>
+	std::vector<VALUE_T> sample_normal_multivariate_identity(const VALUE_T mean, const int dimensions, const ull seed);
 
 	/**
 	 * @brief computes Euclidean distance between two vectors
@@ -75,5 +68,6 @@ namespace DCPE
 	 * @param second second vector argument
 	 * @return VALUE_T the Euclidean distance
 	 */
-	VALUE_T distance(vector<VALUE_T> first, vector<VALUE_T> second);
+	template <typename VALUE_T>
+	VALUE_T distance(std::vector<VALUE_T> first, std::vector<VALUE_T> second);
 }

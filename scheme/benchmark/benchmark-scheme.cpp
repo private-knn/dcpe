@@ -3,14 +3,16 @@
 
 #include <benchmark/benchmark.h>
 
-using namespace std;
-
 namespace DCPE
 {
+	// change to run all tests from different seed
+	const auto TEST_SEED = 0x13;
+
+	template <typename VALUE_T>
 	class SchemeBenchmark : public ::benchmark::Fixture
 	{
 		public:
-		inline static const number beta	 = 1 << 20;
+		const VALUE_T beta = 1.0 * (1 << 10);
 
 		void SetUp(const ::benchmark::State& state)
 		{
@@ -18,92 +20,117 @@ namespace DCPE
 		}
 
 		protected:
-		unique_ptr<Scheme> scheme = make_unique<Scheme>(beta);
+		std::unique_ptr<Scheme<VALUE_T>> scheme = std::make_unique<Scheme<VALUE_T>>(beta);
 	};
 
-	BENCHMARK_DEFINE_F(SchemeBenchmark, KeyGen)
-	(benchmark::State& state)
-	{
-		for (auto _ : state)
-		{
-			benchmark::DoNotOptimize(scheme->keygen());
-		}
+#define B_KeyGen(type)                                                \
+	BENCHMARK_TEMPLATE_DEFINE_F(SchemeBenchmark, KeyGen_##type, type) \
+	(benchmark::State & state)                                        \
+	{                                                                 \
+		for (auto _ : state)                                          \
+		{                                                             \
+			benchmark::DoNotOptimize(scheme->keygen());               \
+		}                                                             \
 	}
 
-	BENCHMARK_DEFINE_F(SchemeBenchmark, Encrypt)
-	(benchmark::State& state)
-	{
-		auto key = scheme->keygen();
+	B_KeyGen(float);
+	B_KeyGen(double);
 
-		auto dimensions = state.range(0);
-
-		vector<VALUE_T> message;
-		message.resize(dimensions);
-		for (auto i = 0; i < dimensions; i++)
-		{
-			message[i] = (VALUE_T)rand() / RAND_MAX;
-		}
-
-		vector<VALUE_T> ciphertext;
-		ciphertext.resize(dimensions);
-
-		for (auto _ : state)
-		{
-			benchmark::DoNotOptimize(scheme->encrypt(key, TO_ARRAY(message), dimensions, TO_ARRAY(ciphertext)));
-		}
+#define B_Encrypt(type)                                                                                          \
+	BENCHMARK_TEMPLATE_DEFINE_F(SchemeBenchmark, Encrypt_##type, type)                                           \
+	(benchmark::State & state)                                                                                   \
+	{                                                                                                            \
+		auto key = scheme->keygen();                                                                             \
+                                                                                                                 \
+		auto dimensions = state.range(0);                                                                        \
+                                                                                                                 \
+		std::vector<type> message;                                                                               \
+		message.resize(dimensions);                                                                              \
+		for (auto i = 0; i < dimensions; i++)                                                                    \
+		{                                                                                                        \
+			message[i] = (type)rand() / RAND_MAX;                                                                \
+		}                                                                                                        \
+                                                                                                                 \
+		std::vector<type> ciphertext;                                                                            \
+		ciphertext.resize(dimensions);                                                                           \
+                                                                                                                 \
+		for (auto _ : state)                                                                                     \
+		{                                                                                                        \
+			benchmark::DoNotOptimize(scheme->encrypt(key, TO_ARRAY(message), dimensions, TO_ARRAY(ciphertext))); \
+		}                                                                                                        \
 	}
 
-	BENCHMARK_DEFINE_F(SchemeBenchmark, Decrypt)
-	(benchmark::State& state)
-	{
-		auto key = scheme->keygen();
+	B_Encrypt(float);
+	B_Encrypt(double);
 
-		auto dimensions = state.range(0);
-
-		vector<VALUE_T> message;
-		message.resize(dimensions);
-		for (auto i = 0; i < dimensions; i++)
-		{
-			message[i] = (VALUE_T)rand() / RAND_MAX;
-		}
-
-		vector<VALUE_T> ciphertext;
-		ciphertext.resize(dimensions);
-
-		auto nonce = scheme->encrypt(key, TO_ARRAY(message), dimensions, TO_ARRAY(ciphertext));
-
-		for (auto _ : state)
-		{
-			scheme->decrypt(key, TO_ARRAY(ciphertext), dimensions, nonce, TO_ARRAY(message));
-		}
+#define B_Decrypt(type)                                                                         \
+	BENCHMARK_TEMPLATE_DEFINE_F(SchemeBenchmark, Decrypt_##type, type)                          \
+	(benchmark::State & state)                                                                  \
+	{                                                                                           \
+		auto key = scheme->keygen();                                                            \
+                                                                                                \
+		auto dimensions = state.range(0);                                                       \
+                                                                                                \
+		std::vector<type> message;                                                              \
+		message.resize(dimensions);                                                             \
+		for (auto i = 0; i < dimensions; i++)                                                   \
+		{                                                                                       \
+			message[i] = (type)rand() / RAND_MAX;                                               \
+		}                                                                                       \
+                                                                                                \
+		std::vector<type> ciphertext;                                                           \
+		ciphertext.resize(dimensions);                                                          \
+                                                                                                \
+		auto nonce = scheme->encrypt(key, TO_ARRAY(message), dimensions, TO_ARRAY(ciphertext)); \
+                                                                                                \
+		for (auto _ : state)                                                                    \
+		{                                                                                       \
+			scheme->decrypt(key, TO_ARRAY(ciphertext), dimensions, nonce, TO_ARRAY(message));   \
+		}                                                                                       \
 	}
 
-	BENCHMARK_REGISTER_F(SchemeBenchmark, KeyGen)
-		->Iterations(1 << 20)
+	B_Decrypt(float);
+	B_Decrypt(double);
+
+#define R_KeyGen(type)                                   \
+	BENCHMARK_REGISTER_F(SchemeBenchmark, KeyGen_##type) \
+		->Iterations(1 << 20)                            \
 		->Unit(benchmark::kMicrosecond);
 
-	BENCHMARK_REGISTER_F(SchemeBenchmark, Encrypt)
-		->Args({1})
-		->Args({2})
-		->Args({3})
-		->Args({5})
-		->Args({10})
-		->Args({25})
-		->Args({50})
+	R_KeyGen(float);
+	R_KeyGen(double);
 
-		->Iterations(1 << 15)
+#define R_Encrypt(type)                                   \
+	BENCHMARK_REGISTER_F(SchemeBenchmark, Encrypt_##type) \
+		->Args({1})                                       \
+		->Args({2})                                       \
+		->Args({3})                                       \
+		->Args({5})                                       \
+		->Args({10})                                      \
+		->Args({25})                                      \
+		->Args({50})                                      \
+                                                          \
+		->Iterations(1 << 15)                             \
 		->Unit(benchmark::kMicrosecond);
 
-	BENCHMARK_REGISTER_F(SchemeBenchmark, Decrypt)
-		->Args({1})
-		->Args({2})
-		->Args({3})
-		->Args({5})
-		->Args({10})
-		->Args({25})
-		->Args({50})
+	R_Encrypt(float);
+	R_Encrypt(double);
 
-		->Iterations(1 << 15)
+#define R_Decrypt(type)                                   \
+	BENCHMARK_REGISTER_F(SchemeBenchmark, Decrypt_##type) \
+		->Args({1})                                       \
+		->Args({2})                                       \
+		->Args({3})                                       \
+		->Args({5})                                       \
+		->Args({10})                                      \
+		->Args({25})                                      \
+		->Args({50})                                      \
+                                                          \
+		->Iterations(1 << 15)                             \
 		->Unit(benchmark::kMicrosecond);
+
+	R_Decrypt(float);
+	R_Decrypt(double);
+
 }
 BENCHMARK_MAIN();

@@ -26,8 +26,6 @@
 
 namespace DCPE
 {
-	using namespace std;
-
 	/**
 	 * @brief can be changed to boost::mt19937 or boost::ecuyer1988.
 	 * boost::minstd_rand is NOT crypto-safe.
@@ -35,33 +33,21 @@ namespace DCPE
 	 */
 	typedef boost::random::mt19937_64 base_generator_type;
 
-	number get_ramdom_number(const number max)
+	ull get_ramdom_ull(const ull max)
 	{
-		number material[1];
+		ull material[1];
 #if defined(TESTING) || defined(DEBUG)
 		auto int_material = (int *)material;
 		int_material[0]	  = rand();
 		int_material[1]	  = rand();
 #else
-		RAND_bytes((uchar *)material, sizeof(number));
+		RAND_bytes((uchar *)material, sizeof(ull));
 #endif
 		return material[0] % max;
 	}
 
-	number bytes_to_number(bytes::iterator first_byte)
-	{
-		number material[1];
-		auto byte_material = (byte *)material;
-		for (auto i = 0; i < sizeof(number) / sizeof(byte); i++)
-		{
-			byte_material[0] = *first_byte;
-			first_byte++;
-		}
-
-		return material[0];
-	}
-
-	VALUE_T sample_uniform(const VALUE_T min, const VALUE_T max, const number seed)
+	template <typename VALUE_T>
+	VALUE_T sample_uniform(const VALUE_T min, const VALUE_T max, const ull seed)
 	{
 		base_generator_type generator(seed);
 
@@ -70,15 +56,18 @@ namespace DCPE
 
 		return sampler();
 	}
+	template float sample_uniform<float>(const float min, const float max, const ull seed);
+	template double sample_uniform<double>(const double min, const double max, const ull seed);
 
-	vector<VALUE_T> sample_normal_series(const VALUE_T mean, const VALUE_T variance, const number seed, const number count)
+	template <typename VALUE_T>
+	std::vector<VALUE_T> sample_normal_series(const VALUE_T mean, const VALUE_T variance, const ull seed, const int count)
 	{
 		base_generator_type generator(seed);
 
 		boost::normal_distribution<> distribution(mean, variance);
 		boost::variate_generator<base_generator_type &, boost::normal_distribution<>> sampler(generator, distribution);
 
-		vector<VALUE_T> samples;
+		std::vector<VALUE_T> samples;
 		samples.resize(count);
 
 		for (auto i = 0; i < count; i++)
@@ -88,10 +77,13 @@ namespace DCPE
 
 		return samples;
 	}
+	template std::vector<float> sample_normal_series<float>(const float mean, const float variance, const ull seed, const int count);
+	template std::vector<double> sample_normal_series<double>(const double mean, const double variance, const ull seed, const int count);
 
-	vector<VALUE_T> sample_normal_multivariate_identity(const VALUE_T mean, const number dimensions, const number seed)
+	template <typename VALUE_T>
+	std::vector<VALUE_T> sample_normal_multivariate_identity(const VALUE_T mean, const int dimensions, const ull seed)
 	{
-		auto samples = sample_normal_series(0.0, 1.0, seed, dimensions);
+		auto samples = sample_normal_series<VALUE_T>(0.0, 1.0, seed, dimensions);
 
 		// optimization
 		if (mean != 0)
@@ -106,8 +98,11 @@ namespace DCPE
 
 		return samples;
 	}
+	template std::vector<float> sample_normal_multivariate_identity<float>(const float mean, const int dimensions, const ull seed);
+	template std::vector<double> sample_normal_multivariate_identity<double>(const double mean, const int dimensions, const ull seed);
 
-	VALUE_T distance(vector<VALUE_T> first, vector<VALUE_T> second)
+	template <typename VALUE_T>
+	VALUE_T distance(std::vector<VALUE_T> first, std::vector<VALUE_T> second)
 	{
 		if (first.size() != second.size())
 		{
@@ -122,4 +117,6 @@ namespace DCPE
 
 		return sqrt(result);
 	}
+	template float distance(std::vector<float> first, std::vector<float> second);
+	template double distance(std::vector<double> first, std::vector<double> second);
 }

@@ -4,12 +4,11 @@
 
 namespace DCPE
 {
-	using namespace std;
-
 	/**
 	 * @brief an implementation of the DCPE scheme
 	 *
 	 */
+	template <typename VALUE_T>
 	class Scheme
 	{
 		private:
@@ -18,20 +17,14 @@ namespace DCPE
 		/**
 		 * @brief The max value of \f$ s \f$ part of the key
 		 *
-		 * The rationale here is that \f$ s \f$ participates in the following two places in the scheme.
+		 * It needs to be high enough to enable protper security and low enough to account for rounding errors.
 		 *
-		 * 1. \f$ \frac{s \beta}{4} \f$ with \f$ \beta \f$ being a 32-bit number.
-		 * The result of this needs to fit in 64 bits in the worst case, so \f$ s \f$ is 32 bits max.
+		 * In particular, \f$ s \f$ is used in \f$ \frac{s \cdot \beta}{4} \f$, and this value should be rounded as least as possible.
 		 *
-		 * 2. \f$ s m + \lambda_m \f$ with \f$ m \f$ being a vector of floats, 32-bit numbers.
-		 * By the same logic, \f$ s \f$ is 32 bits max.
-		 *
-		 * Thus, the max value of \f$ s \f$ is the largest 32 bit uint.
+		 * For now we put an empirical guess.
 		 *
 		 */
-		// const number max_s = UINT32_MAX;
-		// TODO
-		const number max_s = 1000;
+		const VALUE_T max_s = 1000.0;
 
 		/**
 		 * @brief a helper that computes \f$ \lambda_m \f$ value
@@ -41,7 +34,7 @@ namespace DCPE
 		 * @param dimensions the number of dimensions of the message/ciphertext
 		 * @return vector<VALUE_T> the \f$ \lambda_m \f$ intermediate value
 		 */
-		vector<VALUE_T> compute_lambda_m(key& key, pair<number, number>& nonce, size_t dimensions);
+		std::vector<VALUE_T> compute_lambda_m(key& key, std::pair<ull, ull>& nonce, int dimensions);
 
 		public:
 		/**
@@ -67,7 +60,7 @@ namespace DCPE
 		 * @param ciphertext the encrypted vector (has to be allocated of length dimensions)
 		 * @return bytes the nonce used in encryption
 		 */
-		pair<number, number> encrypt(key& key, const VALUE_T* message, size_t dimensions, VALUE_T* ciphertext);
+		std::pair<ull, ull> encrypt(key& key, const VALUE_T* message, int dimensions, VALUE_T* ciphertext);
 
 		/**
 		 * @brief decrypts the encrypted vector under given key
@@ -78,6 +71,6 @@ namespace DCPE
 		 * @param nonce the nonce used in encryption
 		 * @param message the original vector (has to be allocated of length dimensions)
 		 */
-		void decrypt(key& key, const VALUE_T* ciphertext, size_t dimensions, pair<number, number>& nonce, VALUE_T* message);
+		void decrypt(key& key, const VALUE_T* ciphertext, int dimensions, std::pair<ull, ull>& nonce, VALUE_T* message);
 	};
 }

@@ -6,38 +6,45 @@
 #include <cmath>
 #include <numeric>
 
-using namespace std;
+// change to run all tests from different seed
+const auto TEST_SEED = 0x13;
 
 namespace DCPE
 {
+	template <typename VALUE_T>
 	class UtilityTest : public ::testing::Test
 	{
 	};
 
-	TEST_F(UtilityTest, UniformDifferentSeed)
+	using testing::Types;
+
+	typedef Types<float, double> ValidVectorTypes;
+	TYPED_TEST_SUITE(UtilityTest, ValidVectorTypes);
+
+	TYPED_TEST(UtilityTest, UniformDifferentSeed)
 	{
 		const auto seed = 13uLL;
-		for (number i = 0; i < 100; i++)
+		for (int i = 0; i < 100; i++)
 		{
-			auto first	= sample_uniform(0, 100, seed);
-			auto second = sample_uniform(0, 100, seed + 1);
+			auto first	= sample_uniform<TypeParam>(0.0, 100.0, seed);
+			auto second = sample_uniform<TypeParam>(0.0, 1000.0, seed + 1);
 
 			ASSERT_NE(first, second);
 		}
 	}
 
-	TEST_F(UtilityTest, UniformSameSeed)
+	TYPED_TEST(UtilityTest, UniformSameSeed)
 	{
-		for (number i = 0; i < 100; i++)
+		for (int i = 0; i < 100; i++)
 		{
-			auto first	= sample_uniform(0, 100, i);
-			auto second = sample_uniform(0, 100, i);
+			auto first	= sample_uniform<TypeParam>(0.0, 100.0, i);
+			auto second = sample_uniform<TypeParam>(0.0, 100.0, i);
 
 			ASSERT_EQ(first, second);
 		}
 	}
 
-	TEST_F(UtilityTest, UniformCheckDistribution)
+	TYPED_TEST(UtilityTest, UniformCheckDistribution)
 	{
 		const auto seed	 = 13uLL;
 		const auto min	 = 0.0;
@@ -45,53 +52,53 @@ namespace DCPE
 		const auto runs	 = 100000uLL;
 		const auto error = runs * 0.01;
 
-		vector<VALUE_T> samples;
-		for (number i = 0; i < runs; i++)
+		std::vector<TypeParam> samples;
+		for (int i = 0; i < runs; i++)
 		{
-			auto sample = sample_uniform(min, max, seed + i);
+			auto sample = sample_uniform<TypeParam>(min, max, seed + i);
 
 			samples.push_back(sample);
 			ASSERT_GE(sample, min);
 			ASSERT_LE(sample, max);
 		}
 
-		VALUE_T sum	 = std::accumulate(samples.begin(), samples.end(), 0.0);
-		VALUE_T mean = sum / samples.size();
+		TypeParam sum  = std::accumulate(samples.begin(), samples.end(), 0.0);
+		TypeParam mean = sum / samples.size();
 
 		ASSERT_NEAR(mean, (max - min) / 2, error);
 
-		VALUE_T sq_sum	 = std::inner_product(samples.begin(), samples.end(), samples.begin(), 0.0);
-		VALUE_T variance = sq_sum / samples.size() - mean * mean;
+		TypeParam sq_sum   = std::inner_product(samples.begin(), samples.end(), samples.begin(), 0.0);
+		TypeParam variance = sq_sum / samples.size() - mean * mean;
 
 		ASSERT_NEAR(variance, (max - min) * (max - min) / 12.0, error);
 	}
 
-	TEST_F(UtilityTest, NormalDifferentSeed)
+	TYPED_TEST(UtilityTest, NormalDifferentSeed)
 	{
 		const auto seed	 = 13uLL;
 		const auto count = 10uLL;
-		for (number i = 0; i < 100; i++)
+		for (int i = 0; i < 100; i++)
 		{
-			auto first	= sample_normal_series(0, 100, seed, count);
-			auto second = sample_normal_series(0, 100, seed + 1, count);
+			auto first	= sample_normal_series<TypeParam>(0.0, 100.0, seed, count);
+			auto second = sample_normal_series<TypeParam>(0.0, 100.0, seed + 1, count);
 
 			ASSERT_NE(first, second);
 		}
 	}
 
-	TEST_F(UtilityTest, NormalSameSeed)
+	TYPED_TEST(UtilityTest, NormalSameSeed)
 	{
 		const auto count = 10uLL;
-		for (number i = 0; i < 100; i++)
+		for (int i = 0; i < 100; i++)
 		{
-			auto first	= sample_normal_series(0, 100, i, count);
-			auto second = sample_normal_series(0, 100, i, count);
+			auto first	= sample_normal_series<TypeParam>(0.0, 100.0, i, count);
+			auto second = sample_normal_series<TypeParam>(0.0, 100.0, i, count);
 
 			ASSERT_EQ(first, second);
 		}
 	}
 
-	TEST_F(UtilityTest, NormalCheckDistribution)
+	TYPED_TEST(UtilityTest, NormalCheckDistribution)
 	{
 		const auto seed		= 13uLL;
 		const auto mu		= 0.0;
@@ -99,54 +106,58 @@ namespace DCPE
 		const auto runs		= 100000uLL;
 		const auto error	= runs * 0.01;
 
-		auto samples = sample_normal_series(mu, sigma_sq, seed, runs);
+		auto samples = sample_normal_series<TypeParam>(mu, sigma_sq, seed, runs);
 
-		VALUE_T sum	 = std::accumulate(samples.begin(), samples.end(), 0.0);
-		VALUE_T mean = sum / samples.size();
+		TypeParam sum  = std::accumulate(samples.begin(), samples.end(), 0.0);
+		TypeParam mean = sum / samples.size();
 
 		ASSERT_NEAR(mean, mu, error);
 
-		VALUE_T sq_sum	 = std::inner_product(samples.begin(), samples.end(), samples.begin(), 0.0);
-		VALUE_T variance = sq_sum / samples.size() - mean * mean;
+		TypeParam sq_sum   = std::inner_product(samples.begin(), samples.end(), samples.begin(), 0.0);
+		TypeParam variance = sq_sum / samples.size() - mean * mean;
 
 		ASSERT_NEAR(variance, sigma_sq, error);
 	}
 
-	TEST_F(UtilityTest, NormalMultivariateDifferentSeed)
+	TYPED_TEST(UtilityTest, NormalMultivariateDifferentSeed)
 	{
 		const auto seed	 = 13uLL;
 		const auto count = 10uLL;
-		for (number i = 0; i < 100; i++)
+		for (int i = 0; i < 100; i++)
 		{
-			auto first	= sample_normal_multivariate_identity(0, count, seed);
-			auto second = sample_normal_multivariate_identity(0, count, seed + 1);
+			auto first	= sample_normal_multivariate_identity<TypeParam>(0.0, count, seed);
+			auto second = sample_normal_multivariate_identity<TypeParam>(0.0, count, seed + 1);
 
 			ASSERT_NE(first, second);
 		}
 	}
 
-	TEST_F(UtilityTest, NormalMultivariateSameSeed)
+	TYPED_TEST(UtilityTest, NormalMultivariateSameSeed)
 	{
 		const auto count = 10uLL;
-		for (number i = 0; i < 100; i++)
+		for (int i = 0; i < 100; i++)
 		{
-			auto first	= sample_normal_multivariate_identity(1, count, i);
-			auto second = sample_normal_multivariate_identity(1, count, i);
+			auto first	= sample_normal_multivariate_identity<TypeParam>(1.0, count, i);
+			auto second = sample_normal_multivariate_identity<TypeParam>(1.0, count, i);
 
 			ASSERT_EQ(first, second);
 		}
 	}
 
-	TEST_F(UtilityTest, DistanceSimple)
+	TYPED_TEST(UtilityTest, DistanceSimple)
 	{
-		auto result = distance({1, 0, 5}, {0, 2, 4});
+		std::vector<TypeParam> a = {1.0, 0.0, 5.0};
+		std::vector<TypeParam> b = {0.0, 2.0, 4.0};
+		auto result			= distance<TypeParam>(a, b);
 
 		ASSERT_NEAR(sqrt(6), result, 0.0000001);
 	}
 
-	TEST_F(UtilityTest, DistanceVectorsDifferentSize)
+	TYPED_TEST(UtilityTest, DistanceVectorsDifferentSize)
 	{
-		EXPECT_THROW({ distance({1, 0, 5}, {0, 2, 4, 5}); }, Exception);
+		std::vector<TypeParam> a = {1.0, 0.0, 5.0};
+		std::vector<TypeParam> b = {0.0, 2.0, 4.0, 5.0};
+		EXPECT_THROW({ distance<TypeParam>(a, b); }, Exception);
 	}
 }
 

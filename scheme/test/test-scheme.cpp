@@ -4,37 +4,44 @@
 
 #include "gtest/gtest.h"
 
-using namespace std;
+// change to run all tests from different seed
+const auto TEST_SEED = 0x13;
 
 namespace DCPE
 {
-	class SchemeTest : public ::testing::Test
+	template <typename TypeParam>
+	class SchemeTest : public testing::Test
 	{
 		public:
-		inline static const number beta = 1 << 10;
+		const TypeParam beta = 1.0 * (1 << 10);
 
 		protected:
-		unique_ptr<Scheme> scheme;
+		std::unique_ptr<Scheme<TypeParam>> scheme;
 
 		SchemeTest()
 		{
-			this->scheme = make_unique<Scheme>(beta);
+			this->scheme = std::make_unique<Scheme<TypeParam>>(beta);
 		}
 	};
 
-	TEST_F(SchemeTest, Initialization)
+	using testing::Types;
+
+	typedef Types<float, double> ValidVectorTypes;
+	TYPED_TEST_SUITE(SchemeTest, ValidVectorTypes);
+
+	TYPED_TEST(SchemeTest, Initialization)
 	{
 		SUCCEED();
 	}
 
-	TEST_F(SchemeTest, EncryptDecrypt)
+	TYPED_TEST(SchemeTest, EncryptDecrypt)
 	{
 		const auto runs	 = 1000;
 		const auto error = 1.0;
 
 		auto get_random_value = [](auto min, auto max)
 		{
-			VALUE_T f = (VALUE_T)rand() / RAND_MAX;
+			TypeParam f = (TypeParam)rand() / RAND_MAX;
 			return min + f * (max - min);
 		};
 
@@ -42,22 +49,22 @@ namespace DCPE
 		{
 			for (auto run = 0; run < runs; run++)
 			{
-				auto key = scheme->keygen();
+				auto key = this->scheme->keygen();
 
-				vector<VALUE_T> message;
+				std::vector<TypeParam> message;
 				message.resize(dimensions);
 				for (auto i = 0; i < dimensions; i++)
 				{
 					message[i] = get_random_value(-1000.0, +1000.0);
 				}
 
-				vector<VALUE_T> ciphertext;
+				std::vector<TypeParam> ciphertext;
 				ciphertext.resize(dimensions);
-				auto nonce = scheme->encrypt(key, TO_ARRAY(message), dimensions, TO_ARRAY(ciphertext));
+				auto nonce = this->scheme->encrypt(key, TO_ARRAY(message), dimensions, TO_ARRAY(ciphertext));
 
-				vector<VALUE_T> decrypted;
+				std::vector<TypeParam> decrypted;
 				decrypted.resize(dimensions);
-				scheme->decrypt(key, TO_ARRAY(ciphertext), dimensions, nonce, TO_ARRAY(decrypted));
+				this->scheme->decrypt(key, TO_ARRAY(ciphertext), dimensions, nonce, TO_ARRAY(decrypted));
 
 				for (auto i = 0; i < dimensions; i++)
 				{
@@ -67,22 +74,22 @@ namespace DCPE
 		}
 	}
 
-	TEST_F(SchemeTest, PreserveDistanceComparison)
+	TYPED_TEST(SchemeTest, PreserveDistanceComparison)
 	{
 		const auto runs = 1000;
 
 		auto get_random_vector = [](auto dimensions, auto min, auto max)
 		{
-			vector<VALUE_T> result;
+			std::vector<TypeParam> result;
 			result.resize(dimensions);
 			for (auto i = 0; i < dimensions; i++)
 			{
-				result[i] = min + ((VALUE_T)rand() / RAND_MAX) * (max - min);
+				result[i] = min + ((TypeParam)rand() / RAND_MAX) * (max - min);
 			}
 			return result;
 		};
 
-		auto check_implication = [](VALUE_T d1, VALUE_T d2, VALUE_T df1, VALUE_T df2)
+		auto check_implication = [beta = this->beta](TypeParam d1, TypeParam d2, TypeParam df1, TypeParam df2)
 		{
 			if (d1 < d2 - beta)
 			{
@@ -98,20 +105,20 @@ namespace DCPE
 		{
 			for (auto run = 0; run < runs; run++)
 			{
-				auto key = scheme->keygen();
+				auto key = this->scheme->keygen();
 
 				auto x = get_random_vector(dimensions, -1000.0, +1000.0);
 				auto y = get_random_vector(dimensions, -1000.0, +1000.0);
 				auto z = get_random_vector(dimensions, -1000.0, +1000.0);
 
-				vector<VALUE_T> f_x, f_y, f_z;
+				std::vector<TypeParam> f_x, f_y, f_z;
 				f_x.resize(dimensions);
 				f_y.resize(dimensions);
 				f_z.resize(dimensions);
 
-				scheme->encrypt(key, TO_ARRAY(x), dimensions, TO_ARRAY(f_x));
-				scheme->encrypt(key, TO_ARRAY(y), dimensions, TO_ARRAY(f_y));
-				scheme->encrypt(key, TO_ARRAY(z), dimensions, TO_ARRAY(f_z));
+				this->scheme->encrypt(key, TO_ARRAY(x), dimensions, TO_ARRAY(f_x));
+				this->scheme->encrypt(key, TO_ARRAY(y), dimensions, TO_ARRAY(f_y));
+				this->scheme->encrypt(key, TO_ARRAY(z), dimensions, TO_ARRAY(f_z));
 
 				auto xy = distance(x, y);
 				auto yz = distance(y, z);

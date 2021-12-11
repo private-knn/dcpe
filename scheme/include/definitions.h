@@ -6,33 +6,24 @@
 #include <string>
 #include <vector>
 
-// change to run all tests from different seed
-#define TEST_SEED 0x13
-
 #define TO_ARRAY(x) &x[0]
-
-#define VALUE_T float
 
 namespace DCPE
 {
-	using namespace std;
+	using ull	= unsigned long long;
+	using uchar = unsigned char;
+	using byte	= unsigned char;
+	using uint	= unsigned int;
+	using bytes = std::vector<byte>;
 
-	// defines the integer type block ID
-	// change (e.g. to unsigned int) if needed
-	using number = unsigned long long;
-	using uchar	 = unsigned char;
-	using byte	 = unsigned char;
-	using uint	 = unsigned int;
-	using bytes	 = vector<byte>;
-
-	using key = tuple<number, number, number>;
+	using key = std::tuple<ull, ull, ull>;
 
 	/**
 	 * @brief Primitive exception class that passes along the excpetion message
 	 *
 	 * Can consume std::string, C-string and boost::format
 	 */
-	class Exception : public exception
+	class Exception : public std::exception
 	{
 		public:
 		explicit Exception(const char* message) :
@@ -40,7 +31,7 @@ namespace DCPE
 		{
 		}
 
-		explicit Exception(const string& message) :
+		explicit Exception(const std::string& message) :
 			msg_(message)
 		{
 		}
@@ -58,6 +49,6 @@ namespace DCPE
 		}
 
 		protected:
-		string msg_;
+		std::string msg_;
 	};
 }
