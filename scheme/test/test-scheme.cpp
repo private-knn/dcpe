@@ -1,4 +1,3 @@
-#include "definitions.h"
 #include "scheme.hpp"
 #include "utility.hpp"
 
@@ -13,7 +12,8 @@ namespace DCPE
 	class SchemeTest : public testing::Test
 	{
 		public:
-		const TypeParam beta = 1.0 * (1 << 10);
+		const TypeParam beta  = 1.0 * (1 << 10);
+		const TypeParam max_s = 10000.0;
 
 		protected:
 		std::unique_ptr<Scheme<TypeParam>> scheme;
@@ -21,6 +21,7 @@ namespace DCPE
 		SchemeTest()
 		{
 			this->scheme = std::make_unique<Scheme<TypeParam>>(beta);
+			this->scheme->set_max_s(max_s);
 		}
 	};
 
@@ -32,6 +33,11 @@ namespace DCPE
 	TYPED_TEST(SchemeTest, Initialization)
 	{
 		SUCCEED();
+	}
+
+	TYPED_TEST(SchemeTest, InvalidMaxS)
+	{
+		EXPECT_THROW({ this->scheme->set_max_s(-1.0); }, Exception);
 	}
 
 	TYPED_TEST(SchemeTest, EncryptDecrypt)

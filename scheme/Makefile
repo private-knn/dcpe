@@ -91,15 +91,15 @@ $(ODIR)/%.o: $(SDIR)/%.cpp $(DEPS)
 
 # commands
 
+# will compile the test against the library (not objects and sources) and will run it
+run-shared-lib: shared
+	$(CC) -o $(BDIR)/test-shared-lib $(TDIR)/test-shared-lib.cpp -I $(IDIR) -L $(BDIR) -l $(LIBNAME) $(CPPFLAGS)
+	$(BDIR)/test-shared-lib
+
 # some Linuxes do not respect -L flag during execution, so we can modify the system LD path
 ldconfig:
 	@echo $(shell pwd)/bin > /etc/ld.so.conf.d/dcpe-dev.conf
 	@ldconfig
-
-# will compile the test against the library (not objects and sources) and will run it
-# run-shared-lib: shared
-# 	$(CC) -o $(BDIR)/test-shared-lib $(TDIR)/test-shared-lib.cpp -I $(IDIR) -L $(BDIR) -l $(LIBNAME) $(CPPFLAGS)
-# 	$(BDIR)/test-shared-lib
 
 run-tests-junit: CPPFLAGS += -DTESTING
 run-tests-junit: $(TESTBIN)

@@ -12,16 +12,16 @@ namespace DCPE
 		beta(beta) {}
 
 	template <typename VALUE_T>
-	key Scheme<VALUE_T>::keygen()
+	key<VALUE_T> Scheme<VALUE_T>::keygen()
 	{
 		return {
 			get_ramdom_ull(ULLONG_MAX),
 			get_ramdom_ull(ULLONG_MAX),
-			get_ramdom_ull(max_s - 1) + 1}; // TODO(dmytro): must be uniform VALUE_T
+			sample_uniform<VALUE_T>(0.000001, max_s, get_ramdom_ull(ULLONG_MAX))};
 	}
 
 	template <typename VALUE_T>
-	std::pair<ull, ull> Scheme<VALUE_T>::encrypt(key& key, const VALUE_T* message, int dimensions, VALUE_T* ciphertext)
+	std::pair<ull, ull> Scheme<VALUE_T>::encrypt(key<VALUE_T>& key, const VALUE_T* message, int dimensions, VALUE_T* ciphertext)
 	{
 		std::pair nonce = {get_ramdom_ull(), get_ramdom_ull()};
 
@@ -36,7 +36,7 @@ namespace DCPE
 	}
 
 	template <typename VALUE_T>
-	void Scheme<VALUE_T>::decrypt(key& key, const VALUE_T* ciphertext, int dimensions, std::pair<ull, ull>& nonce, VALUE_T* message)
+	void Scheme<VALUE_T>::decrypt(key<VALUE_T>& key, const VALUE_T* ciphertext, int dimensions, std::pair<ull, ull>& nonce, VALUE_T* message)
 	{
 		auto lambda_m = compute_lambda_m(key, nonce, dimensions);
 
@@ -47,7 +47,7 @@ namespace DCPE
 	}
 
 	template <typename VALUE_T>
-	std::vector<VALUE_T> Scheme<VALUE_T>::compute_lambda_m(key& key, std::pair<ull, ull>& nonce, int dimensions)
+	std::vector<VALUE_T> Scheme<VALUE_T>::compute_lambda_m(key<VALUE_T>& key, std::pair<ull, ull>& nonce, int dimensions)
 	{
 		auto radius = (get<2>(key) / 4) * beta;
 
@@ -66,6 +66,17 @@ namespace DCPE
 		}
 
 		return lambda_m;
+	}
+
+	template <typename VALUE_T>
+	void Scheme<VALUE_T>::set_max_s(VALUE_T max_s)
+	{
+		if (max_s <= 0.0)
+		{
+			throw Exception(boost::format("Invalid value of max_s: %f") % max_s);
+		}
+
+		this->max_s = max_s;
 	}
 
 	template class Scheme<float>;

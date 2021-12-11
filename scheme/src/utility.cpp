@@ -14,16 +14,6 @@
 #include <random>
 #include <vector>
 
-#ifndef TESTING
-#define CHECK_OPENSSL_ERROR(condition, message)                                        \
-	if (condition)                                                                     \
-	{                                                                                  \
-		throw Exception(boost::format("%s, error 0x%lx") % message % ERR_get_error()); \
-	}
-#else
-#define CHECK_OPENSSL_ERROR(condition, message)
-#endif
-
 namespace DCPE
 {
 	/**

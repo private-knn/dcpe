@@ -65,15 +65,15 @@ benchmarks:
   tags:
     - docker
 
-# shared-library:
-#   image: dbogatov/docker-images:pbc-latest
-#   stage: test
-#   script:
-#     - cd ./$PROJECT_DIR/
-#     - make shared ldconfig run-shared-lib
-#   dependencies: []
-#   tags:
-#     - docker
+shared-library:
+  image: dbogatov/docker-images:faiss-latest
+  stage: test
+  script:
+    - cd ./$PROJECT_DIR/
+    - make shared ldconfig run-shared-lib
+  dependencies: []
+  tags:
+    - docker
 
 release-library:
   image: dbogatov/docker-images:alpine-extras-latest
@@ -127,8 +127,9 @@ pages:
     - docker
   only:
     - master
-# include:
-#   # DEPLOY
-#   - project: "templates/ci-snippets"
-#     file: "trigger-websites-deploy.yml"
-#     ref: *ref
+
+include:
+  # DEPLOY
+  - project: "templates/ci-snippets"
+    file: "trigger-websites-deploy.yml"
+    ref: *ref

@@ -16,7 +16,8 @@ namespace DCPE
 	using uint	= unsigned int;
 	using bytes = std::vector<byte>;
 
-	using key = std::tuple<ull, ull, ull>;
+	template <typename VALUE_T>
+	using key = std::tuple<ull, ull, VALUE_T>;
 
 	/**
 	 * @brief Primitive exception class that passes along the excpetion message
