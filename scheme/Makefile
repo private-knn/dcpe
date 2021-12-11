@@ -120,6 +120,7 @@ coverage: profile
 
 docs: clean-docs
 	doxygen ../Doxyfile
+	git clone https://github.com/mathjax/MathJax.git ../docs/html/mathjax
 
 clean: clean-docs clean-binaries
 	$(RM) $(ODIR)/* *~ *.dSYM *.gcov *.gcda *.gcno *.bin coverage-html junit-*.xml cobertura.xml
