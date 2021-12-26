@@ -95,9 +95,17 @@ release-library:
     - master
 
 docs-website:
-  variables:
-    GIT_STRATEGY: none
   stage: release
+  image:
+    name: docker:stable
+  services:
+   - name: docker:dind
+     alias: dockerdaemon
+  variables:
+    DOCKER_HOST: tcp://dockerdaemon:2375/
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+    GIT_STRATEGY: none
   script:
     - docker build -t $CI_REGISTRY/$CI_PROJECT_PATH:$CI_BUILD_REF_NAME .
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
@@ -105,7 +113,7 @@ docs-website:
   dependencies:
     - build-docs
   tags:
-    - shell
+    - docker
   only:
     - master
 
