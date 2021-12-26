@@ -48,7 +48,7 @@ namespace DCPE
 		const auto seed	 = 13uLL;
 		const auto min	 = 0.0;
 		const auto max	 = 100.0;
-		const auto runs	 = 100000uLL;
+		const auto runs	 = 100000;
 		const auto error = runs * 0.01;
 
 		std::vector<TypeParam> samples;

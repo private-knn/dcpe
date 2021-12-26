@@ -29,7 +29,7 @@ namespace DCPE
 
 		for (auto i = 0; i < dimensions; i++)
 		{
-			ciphertext[i] = message[i] * get<2>(key) + lambda_m[i];
+			ciphertext[i] = message[i] * std::get<2>(key) + lambda_m[i];
 		}
 
 		return nonce;
@@ -42,18 +42,18 @@ namespace DCPE
 
 		for (auto i = 0; i < dimensions; i++)
 		{
-			message[i] = (ciphertext[i] - lambda_m[i]) / get<2>(key);
+			message[i] = (ciphertext[i] - lambda_m[i]) / std::get<2>(key);
 		}
 	}
 
 	template <typename VALUE_T>
 	std::vector<VALUE_T> Scheme<VALUE_T>::compute_lambda_m(key<VALUE_T>& key, std::pair<ull, ull>& nonce, int dimensions)
 	{
-		auto radius = (get<2>(key) / 4) * beta;
+		auto radius = (std::get<2>(key) / 4) * beta;
 
-		auto u = sample_normal_multivariate_identity<VALUE_T>(0.0, dimensions, get<0>(key) ^ nonce.first);
+		auto u = sample_normal_multivariate_identity<VALUE_T>(0.0, dimensions, std::get<0>(key) ^ nonce.first);
 
-		auto x_prime = sample_uniform<VALUE_T>(0.0, 1.0, get<1>(key) ^ nonce.second);
+		auto x_prime = sample_uniform<VALUE_T>(0.0, 1.0, std::get<1>(key) ^ nonce.second);
 
 		auto x = radius * pow(x_prime, 1.0 / dimensions);
 
