@@ -5,8 +5,7 @@
 			"includePath": [
 				"${workspaceFolder}/**",
 				"${workspaceFolder}/scheme/include/*",
-				"/usr/local/Cellar/boost/1.72.0/include",
-				"/usr/local/opt/openssl/include"
+				"/opt/homebrew/Cellar/boost/1.76.0/include"
 			],
 			"defines": [],
 			"macFrameworkPath": [

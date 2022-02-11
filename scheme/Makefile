@@ -8,11 +8,11 @@ ODIR=obj
 LDIR=lib
 BDIR=bin
 
-LDFLAGS=-L $(LDIR) -L /usr/local/opt/openssl/lib
+override LDFLAGS += -L $(LDIR)
 LDLIBS=-l boost_system -l ssl -l crypto # libs for main code
 LDTESTLIBS=-l gtest -l pthread -l benchmark # libs for tests and benchmarks
 
-INCLUDES=-I $(IDIR) -I /usr/local/opt/openssl/include
+INCLUDES=-I $(IDIR)
 override CPPFLAGS += --std=c++2a -Wall -Wno-unknown-pragmas -fPIC
 CC=g++
 RM=rm -rf
