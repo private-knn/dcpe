@@ -46,3 +46,11 @@ make clean coverage
 # to generate documentation
 make clean docs
 ```
+
+### Notes for M1 mac
+
+Use this to compile libraries from source (e.g. `gtest`, google `benchmark`)
+
+```bash
+cmake .. -DCMAKE_INSTALL_PREFIX=/opt/homebrew/ -DCMAKE_CXX_COMPILER=/opt/homebrew/bin/g++
+```
