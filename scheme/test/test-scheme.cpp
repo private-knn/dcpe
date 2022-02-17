@@ -47,7 +47,7 @@ namespace DCPE
 
 		auto get_random_value = [](auto min, auto max)
 		{
-			TypeParam f = (TypeParam)rand() / RAND_MAX;
+			TypeParam f = static_cast<TypeParam>(rand()) / static_cast<float>(RAND_MAX);
 			return min + f * (max - min);
 		};
 
@@ -90,7 +90,7 @@ namespace DCPE
 			result.resize(dimensions);
 			for (auto i = 0; i < dimensions; i++)
 			{
-				result[i] = min + ((TypeParam)rand() / RAND_MAX) * (max - min);
+				result[i] = min + (static_cast<TypeParam>(rand()) / static_cast<double>(RAND_MAX)) * (max - min);
 			}
 			return result;
 		};

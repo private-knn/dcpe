@@ -7,10 +7,6 @@
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <iomanip>
-#include <openssl/bio.h>
-#include <openssl/err.h>
-#include <openssl/pem.h>
-#include <openssl/rand.h>
 #include <random>
 #include <vector>
 
@@ -26,13 +22,9 @@ namespace DCPE
 	ull get_ramdom_ull(const ull max)
 	{
 		ull material[1];
-#if defined(TESTING) || defined(DEBUG)
 		auto int_material = (int *)material;
 		int_material[0]	  = rand();
 		int_material[1]	  = rand();
-#else
-		RAND_bytes((uchar *)material, sizeof(ull));
-#endif
 		return material[0] % max;
 	}
 

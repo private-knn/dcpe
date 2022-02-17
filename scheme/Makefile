@@ -9,13 +9,19 @@ LDIR=lib
 BDIR=bin
 
 override LDFLAGS += -L $(LDIR)
-LDLIBS=-l boost_system -l ssl -l crypto # libs for main code
+LDLIBS=-l boost_system # libs for main code
 LDTESTLIBS=-l gtest -l pthread -l benchmark # libs for tests and benchmarks
 
 INCLUDES=-I $(IDIR)
-override CPPFLAGS += --std=c++2a -Wall -Wno-unknown-pragmas -fPIC
-CC=g++
+override CPPFLAGS += --std=c++20 -Wall -Wno-unknown-pragmas -fPIC
 RM=rm -rf
+
+arch := $(shell uname -m)
+ifeq ($(arch),arm64)
+	CC = clang++
+else
+	CC = g++
+endif
 
 LIBNAME=dcpe
 

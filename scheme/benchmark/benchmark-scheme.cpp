@@ -48,7 +48,7 @@ namespace DCPE
 		message.resize(dimensions);                                                                              \
 		for (auto i = 0; i < dimensions; i++)                                                                    \
 		{                                                                                                        \
-			message[i] = (type)rand() / RAND_MAX;                                                                \
+			message[i] = static_cast<type>(rand()) / static_cast<double>(RAND_MAX);                              \
 		}                                                                                                        \
                                                                                                                  \
 		std::vector<type> ciphertext;                                                                            \
@@ -75,7 +75,7 @@ namespace DCPE
 		message.resize(dimensions);                                                             \
 		for (auto i = 0; i < dimensions; i++)                                                   \
 		{                                                                                       \
-			message[i] = (type)rand() / RAND_MAX;                                               \
+			message[i] = static_cast<type>(rand()) / static_cast<double>(RAND_MAX);             \
 		}                                                                                       \
                                                                                                 \
 		std::vector<type> ciphertext;                                                           \
