@@ -103,12 +103,8 @@ namespace DCPE
 #define R_Encrypt(type)                                   \
 	BENCHMARK_REGISTER_F(SchemeBenchmark, Encrypt_##type) \
 		->Args({1})                                       \
-		->Args({2})                                       \
-		->Args({3})                                       \
-		->Args({5})                                       \
-		->Args({10})                                      \
-		->Args({25})                                      \
-		->Args({50})                                      \
+		->Args({100})                                     \
+		->Args({768})                                     \
                                                           \
 		->Iterations(1 << 15)                             \
 		->Unit(benchmark::kMicrosecond);
@@ -119,12 +115,8 @@ namespace DCPE
 #define R_Decrypt(type)                                   \
 	BENCHMARK_REGISTER_F(SchemeBenchmark, Decrypt_##type) \
 		->Args({1})                                       \
-		->Args({2})                                       \
-		->Args({3})                                       \
-		->Args({5})                                       \
-		->Args({10})                                      \
-		->Args({25})                                      \
-		->Args({50})                                      \
+		->Args({100})                                     \
+		->Args({768})                                     \
                                                           \
 		->Iterations(1 << 15)                             \
 		->Unit(benchmark::kMicrosecond);
