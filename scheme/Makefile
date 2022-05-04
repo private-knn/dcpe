@@ -13,7 +13,7 @@ LDLIBS=-l boost_system # libs for main code
 LDTESTLIBS=-l gtest -l pthread -l benchmark # libs for tests and benchmarks
 
 INCLUDES=-I $(IDIR)
-override CPPFLAGS += --std=c++2a -Wall -Wno-unknown-pragmas -fPIC
+override CPPFLAGS += -std=c++2a -Wall -Wno-unknown-pragmas -fPIC
 RM=rm -rf
 
 arch := $(shell uname -m)
